@@ -111,7 +111,7 @@ fromString :: String -> Encoding -> Buffer
 fromString str = fromStringImpl str <<< show
 
 foreign import fromStringImpl
-  "function fromString (str) { \
+  "function fromStringImpl (str) { \
   \  return function (encoding) { \
   \    return new Buffer(str, encoding); \
   \  }; \
