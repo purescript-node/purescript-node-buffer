@@ -166,7 +166,7 @@ foreign import toStringImpl
 -- |
 -- Writes a numeric value to a buffer at the specified offset.
 --
-write :: forall e. BufferValueType -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) {}
+write :: forall e. BufferValueType -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 write = writeImpl <<< show
 
 foreign import writeImpl
@@ -179,7 +179,7 @@ foreign import writeImpl
   \      }; \
   \    }; \
   \  }; \
-  \}" :: forall e. String -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) {}
+  \}" :: forall e. String -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 
 -- |
 -- Writes octets from a string to a buffer at the specified offset. Multi-byte 
@@ -233,7 +233,7 @@ foreign import setAtOffset
   \      return {}; \
   \    } \
   \  } \
-  \}" :: forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) {}
+  \}" :: forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 
 -- |
 -- Returns the size of a buffer.
@@ -292,4 +292,4 @@ foreign import fill
   \      } \
   \    } \
   \  } \
-  \}" :: forall e. Octet -> Offset -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) {}
+  \}" :: forall e. Octet -> Offset -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
