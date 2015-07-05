@@ -81,13 +81,13 @@ read :: BufferValueType -> Offset -> Buffer -> Number
 #### `readString`
 
 ``` purescript
-readString :: forall e. Encoding -> Offset -> Offset -> Buffer -> String
+readString :: Encoding -> Offset -> Offset -> Buffer -> String
 ```
 
 #### `toString`
 
 ``` purescript
-toString :: forall e. Encoding -> Buffer -> String
+toString :: Encoding -> Buffer -> String
 ```
 
 #### `write`
