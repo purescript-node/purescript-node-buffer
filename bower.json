@@ -9,6 +9,7 @@
     "tests"
   ],
   "dependencies": {
-    "purescript-maybe": "~0.2.1"
+    "purescript-eff": "~0.1.0",
+    "purescript-maybe": "~0.3.1"
   }
 }

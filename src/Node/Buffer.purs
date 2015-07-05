@@ -22,6 +22,7 @@ module Node.Buffer
   , fill
   ) where
 
+import Prelude
 import Control.Monad.Eff
 import Data.Maybe
 import Node.Encoding
@@ -45,7 +46,7 @@ foreign import data Buffer :: *
 instance showBuffer :: Show Buffer where
   show = showImpl
   
-foreign import showImpl "var showImpl = require('util').inspect;" :: Buffer -> String
+foreign import showImpl :: Buffer -> String
 
 -- |
 -- Effect for buffer modification.
@@ -90,18 +91,12 @@ instance showBufferValueType :: Show BufferValueType where
 -- |
 -- Creates a new buffer of the specified size.
 --
-foreign import create
-  "function create (size) { \
-  \  return new Buffer(size); \
-  \}" :: Number -> Buffer
+foreign import create :: Int -> Buffer
 
 -- |
 -- Creates a new buffer from an array of octets, sized to match the array.
 --
-foreign import fromArray
-  "function fromArray (octets) { \
-  \  return new Buffer(octets); \
-  \}" :: [Octet] -> Buffer
+foreign import fromArray :: Array Octet -> Buffer
 
 -- |
 -- Creates a new buffer from a string with the specified encoding, sized to 
@@ -110,12 +105,7 @@ foreign import fromArray
 fromString :: String -> Encoding -> Buffer
 fromString str = fromStringImpl str <<< show
 
-foreign import fromStringImpl
-  "function fromStringImpl (str) { \
-  \  return function (encoding) { \
-  \    return new Buffer(str, encoding); \
-  \  }; \
-  \}" :: String -> String -> Buffer
+foreign import fromStringImpl :: String -> String -> Buffer
 
 -- |
 -- Reads a numeric value from a buffer at the specified offset.
@@ -123,15 +113,7 @@ foreign import fromStringImpl
 read :: BufferValueType -> Offset -> Buffer -> Number
 read = readImpl <<< show
 
-foreign import readImpl
-  "function readImpl (ty) { \
-  \  return function (offset) { \
-  \    return function (buf) { \
-  \      return buf['read' + ty](offset); \
-  \    }; \
-  \  }; \
-  \}" :: String -> Offset -> Buffer -> Number
-  
+foreign import readImpl :: String -> Offset -> Buffer -> Number
 
 -- |
 -- Reads a section of a buffer as a string with the specified encoding.
@@ -139,16 +121,7 @@ foreign import readImpl
 readString :: forall e. Encoding -> Offset -> Offset -> Buffer -> String
 readString = readStringImpl <<< show
 
-foreign import readStringImpl
-  "function readStringImpl (enc) { \
-  \  return function (start) { \
-  \    return function (end) { \
-  \      return function (buff) { \
-  \        return buff.toString(enc, start, end); \
-  \      } \
-  \    } \
-  \  } \
-  \}":: String -> Offset -> Offset -> Buffer -> String
+foreign import readStringImpl :: String -> Offset -> Offset -> Buffer -> String
   
 -- |
 -- Reads the buffer as a string with the specified encoding.
@@ -156,12 +129,7 @@ foreign import readStringImpl
 toString :: forall e. Encoding -> Buffer -> String
 toString = toStringImpl <<< show
 
-foreign import toStringImpl
-  "function toStringImpl (enc) { \
-  \  return function (buff) { \
-  \    return buff.toString(enc); \
-  \  } \
-  \}":: String -> Buffer -> String
+foreign import toStringImpl :: String -> Buffer -> String
 
 -- |
 -- Writes a numeric value to a buffer at the specified offset.
@@ -169,17 +137,8 @@ foreign import toStringImpl
 write :: forall e. BufferValueType -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 write = writeImpl <<< show
 
-foreign import writeImpl
-  "function writeImpl (ty) { \
-  \  return function (value) { \
-  \    return function (offset) { \
-  \      return function (buf) { \
-  \        buf['write' + ty](value, offset); \
-  \        return {}; \
-  \      }; \
-  \    }; \
-  \  }; \
-  \}" :: forall e. String -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+foreign import writeImpl ::
+  forall e. String -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 
 -- |
 -- Writes octets from a string to a buffer at the specified offset. Multi-byte 
@@ -189,107 +148,53 @@ foreign import writeImpl
 writeString :: forall e. Encoding -> Offset -> Number -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Number
 writeString = writeStringImpl <<< show
 
-foreign import writeStringImpl
-  "function writeStringImpl (enc) { \
-  \  return function (offset) { \
-  \      return function (length) { \
-  \        return function (value) { \
-  \          return function (buff) { \
-  \            return buff.write(value, offset, length, encoding); \
-  \          }; \
-  \        }; \
-  \      }; \
-  \  }; \
-  \}" :: forall e. String -> Offset -> Number -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Number
+foreign import writeStringImpl ::
+  forall e. String -> Offset -> Number -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Number
 
 -- |
 -- Creates an array of octets from a buffer's contents.
 --
-foreign import toArray
-  "function toArray (buff) { \
-  \  return buff.toJSON(); \
-  \}" :: Buffer -> [Octet]
+foreign import toArray :: Buffer -> Array Octet
 
 -- |
 -- Reads an octet from a buffer at the specified offset.
 --
-foreign import getAtOffset
-  "function getAtOffset (buff) { \
-  \  return function (offset) { \
-  \    var octet = buff[offset]; \
-  \    return octet == null ? _ps.Data_Maybe.Nothing \
-  \                         : _ps.Data_Maybe.Just(buff[i]); \
-  \  } \
-  \}" :: Offset -> Buffer -> Maybe Octet
+getAtOffset :: Offset -> Buffer -> Maybe Octet
+getAtOffset = getAtOffsetImpl Just Nothing
+
+foreign import getAtOffsetImpl ::
+  (Octet -> Maybe Octet) -> Maybe Octet -> Offset -> Buffer -> Maybe Octet
 
 -- |
 -- Writes an octet in the buffer at the specified offset.
 --
-foreign import setAtOffset
-  "function setAtOffset (value) { \
-  \  return function (offset) { \
-  \    return function (buff) { \
-  \      buff[offset] = value; \
-  \      return {}; \
-  \    } \
-  \  } \
-  \}" :: forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+foreign import setAtOffset ::
+  forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 
 -- |
 -- Returns the size of a buffer.
 --
-foreign import size
-  "function size (buff) { \
-  \  return buff.length; \
-  \}" :: forall e. Buffer -> Number
+foreign import size :: Buffer -> Number
 
 -- |
 -- Concatenates a list of buffers.
 --
-foreign import concat
-  "function concat (buffs) { \
-  \  return Buffer.concat(buffs); \
-  \}" :: [Buffer] -> Buffer
+foreign import concat :: Array Buffer -> Buffer
   
 -- |
 -- Concatenates a list of buffers, combining them into a new buffer of the 
 -- specified length.
 --
-foreign import concat'
-  "function concat$prime (buffs) { \
-  \  return function (totalLength) { \
-  \    return Buffer.concat(buffs, totalLength); \
-  \  } \
-  \}" :: [Buffer] -> Number -> Buffer
+foreign import concat' :: Array Buffer -> Number -> Buffer
 
 -- |
 -- Copies a section of a source buffer into a target buffer at the specified 
 -- offset.
 --
-foreign import copy
-  "function copy (srcStart) { \
-  \  return function (srcEnd) { \
-  \    return function (src) { \
-  \      return function (targStart) { \
-  \        return function (targ) { \
-  \          return src.copy(targ, targStart, srcStart, strcEnd); \
-  \        } \
-  \      } \
-  \    } \
-  \  } \
-  \}" :: Offset -> Offset -> Buffer -> Offset -> Buffer -> Buffer
+foreign import copy :: Offset -> Offset -> Buffer -> Offset -> Buffer -> Buffer
   
 -- |
 -- Fills a range in a buffer with the specified octet.
 --
-foreign import fill
-  "function fill (buff) { \
-  \  return function (octet) { \
-  \    return function (start) { \
-  \      return function (end) { \
-  \        buff.fill(octet, start, end); \
-  \        return {}; \
-  \      } \
-  \    } \
-  \  } \
-  \}" :: forall e. Octet -> Offset -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+foreign import fill ::
+  forall e. Octet -> Offset -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit

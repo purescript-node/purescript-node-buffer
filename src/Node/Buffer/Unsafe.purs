@@ -9,11 +9,4 @@ import Node.Buffer
 -- This is considered unsafe as writing to a slice can result in action at a 
 -- distance.
 --
-foreign import slice
-  "function slice (start) { \
-  \  return function (end) { \
-  \    return function (buff) { \
-  \      return buff.slice(start, end); \
-  \    } \
-  \  } \
-  \}" :: Offset -> Offset -> Buffer -> Buffer
+foreign import slice :: Offset -> Offset -> Buffer -> Buffer

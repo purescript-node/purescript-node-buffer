@@ -3,6 +3,8 @@ module Node.Encoding
   , byteLength
   ) where
 
+import Prelude
+
 data Encoding
   = ASCII
   | UTF8
@@ -21,12 +23,7 @@ instance showEncoding :: Show Encoding where
   show Binary  = "binary"
   show Hex     = "hex"
 
-foreign import byteLengthImpl
-  "function byteLength (str) { \
-  \  return function (enc) { \
-  \    return Buffer.byteLength(str, enc); \
-  \  } \
-  \}" :: forall e. String -> String -> Number
+foreign import byteLengthImpl :: String -> String -> Number
 
 byteLength :: String -> Encoding -> Number
 byteLength str enc = byteLengthImpl str (show enc)
