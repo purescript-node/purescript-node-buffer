@@ -118,7 +118,7 @@ foreign import readImpl :: String -> Offset -> Buffer -> Number
 -- |
 -- Reads a section of a buffer as a string with the specified encoding.
 --
-readString :: forall e. Encoding -> Offset -> Offset -> Buffer -> String
+readString :: Encoding -> Offset -> Offset -> Buffer -> String
 readString = readStringImpl <<< show
 
 foreign import readStringImpl :: String -> Offset -> Offset -> Buffer -> String
@@ -126,7 +126,7 @@ foreign import readStringImpl :: String -> Offset -> Offset -> Buffer -> String
 -- |
 -- Reads the buffer as a string with the specified encoding.
 --
-toString :: forall e. Encoding -> Buffer -> String
+toString :: Encoding -> Buffer -> String
 toString = toStringImpl <<< show
 
 foreign import toStringImpl :: String -> Buffer -> String
