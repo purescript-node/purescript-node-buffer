@@ -31,12 +31,12 @@ import Node.Encoding
 -- Type synonym indicating the value should be an octet (0-255). If the value 
 -- provided is outside this range it will be used as modulo 255.
 --
-type Octet = Number
+type Octet = Int
 
 -- |
 -- Type synonym indicating the value refers to an offset in a buffer.
 --
-type Offset = Number
+type Offset = Int
 
 -- |
 -- An instance of Node's Buffer class.
@@ -110,10 +110,10 @@ foreign import fromStringImpl :: String -> String -> Buffer
 -- |
 -- Reads a numeric value from a buffer at the specified offset.
 --
-read :: BufferValueType -> Offset -> Buffer -> Number
+read :: BufferValueType -> Offset -> Buffer -> Int
 read = readImpl <<< show
 
-foreign import readImpl :: String -> Offset -> Buffer -> Number
+foreign import readImpl :: String -> Offset -> Buffer -> Int
 
 -- |
 -- Reads a section of a buffer as a string with the specified encoding.
@@ -134,22 +134,22 @@ foreign import toStringImpl :: String -> Buffer -> String
 -- |
 -- Writes a numeric value to a buffer at the specified offset.
 --
-write :: forall e. BufferValueType -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+write :: forall e. BufferValueType -> Int -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 write = writeImpl <<< show
 
 foreign import writeImpl ::
-  forall e. String -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+  forall e. String -> Int -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 
 -- |
 -- Writes octets from a string to a buffer at the specified offset. Multi-byte 
 -- characters will not be written to the buffer if there is not enough capacity
 -- to write them fully. The number of bytes written is returned.
 --
-writeString :: forall e. Encoding -> Offset -> Number -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Number
+writeString :: forall e. Encoding -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Int
 writeString = writeStringImpl <<< show
 
 foreign import writeStringImpl ::
-  forall e. String -> Offset -> Number -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Number
+  forall e. String -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Int
 
 -- |
 -- Creates an array of octets from a buffer's contents.
@@ -174,7 +174,7 @@ foreign import setAtOffset ::
 -- |
 -- Returns the size of a buffer.
 --
-foreign import size :: Buffer -> Number
+foreign import size :: Buffer -> Int
 
 -- |
 -- Concatenates a list of buffers.
@@ -185,7 +185,7 @@ foreign import concat :: Array Buffer -> Buffer
 -- Concatenates a list of buffers, combining them into a new buffer of the 
 -- specified length.
 --
-foreign import concat' :: Array Buffer -> Number -> Buffer
+foreign import concat' :: Array Buffer -> Int -> Buffer
 
 -- |
 -- Copies a section of a source buffer into a target buffer at the specified 

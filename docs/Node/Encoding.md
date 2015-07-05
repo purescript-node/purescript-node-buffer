@@ -21,7 +21,7 @@ instance showEncoding :: Show Encoding
 #### `byteLength`
 
 ``` purescript
-byteLength :: String -> Encoding -> Number
+byteLength :: String -> Encoding -> Int
 ```
 
 

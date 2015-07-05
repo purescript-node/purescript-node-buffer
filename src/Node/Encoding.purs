@@ -23,7 +23,7 @@ instance showEncoding :: Show Encoding where
   show Binary  = "binary"
   show Hex     = "hex"
 
-foreign import byteLengthImpl :: String -> String -> Number
+foreign import byteLengthImpl :: String -> String -> Int
 
-byteLength :: String -> Encoding -> Number
+byteLength :: String -> Encoding -> Int
 byteLength str enc = byteLengthImpl str (show enc)

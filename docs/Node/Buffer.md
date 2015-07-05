@@ -3,13 +3,13 @@
 #### `Octet`
 
 ``` purescript
-type Octet = Number
+type Octet = Int
 ```
 
 #### `Offset`
 
 ``` purescript
-type Offset = Number
+type Offset = Int
 ```
 
 #### `Buffer`
@@ -75,7 +75,7 @@ fromString :: String -> Encoding -> Buffer
 #### `read`
 
 ``` purescript
-read :: BufferValueType -> Offset -> Buffer -> Number
+read :: BufferValueType -> Offset -> Buffer -> Int
 ```
 
 #### `readString`
@@ -93,13 +93,13 @@ toString :: Encoding -> Buffer -> String
 #### `write`
 
 ``` purescript
-write :: forall e. BufferValueType -> Number -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+write :: forall e. BufferValueType -> Int -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
 ```
 
 #### `writeString`
 
 ``` purescript
-writeString :: forall e. Encoding -> Offset -> Number -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Number
+writeString :: forall e. Encoding -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Int
 ```
 
 #### `toArray`
@@ -123,7 +123,7 @@ setAtOffset :: forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BufferWrite
 #### `size`
 
 ``` purescript
-size :: Buffer -> Number
+size :: Buffer -> Int
 ```
 
 #### `concat`
@@ -135,7 +135,7 @@ concat :: Array Buffer -> Buffer
 #### `concat'`
 
 ``` purescript
-concat' :: Array Buffer -> Number -> Buffer
+concat' :: Array Buffer -> Int -> Buffer
 ```
 
 #### `copy`
