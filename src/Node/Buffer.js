@@ -45,27 +45,27 @@ exports.toStringImpl = function (enc) {
   };
 };
 
-exports.writeImpl = function (ty) { 
-  return function (value) { 
-    return function (offset) { 
-      return function (buf) { 
-        buf['write' + ty](value, offset); 
-        return {}; 
-      }; 
-    }; 
-  }; 
+exports.writeImpl = function (ty) {
+  return function (value) {
+    return function (offset) {
+      return function (buf) {
+        buf['write' + ty](value, offset);
+        return {};
+      };
+    };
+  };
 };
 
-exports.writeStringImpl = function (enc) { 
-  return function (offset) { 
-    return function (length) { 
-      return function (value) { 
-        return function (buff) { 
-          return buff.write(value, offset, length, encoding); 
-        }; 
-      }; 
-    }; 
-  }; 
+exports.writeStringImpl = function (enc) {
+  return function (offset) {
+    return function (length) {
+      return function (value) {
+        return function (buff) {
+          return buff.write(value, offset, length, encoding);
+        };
+      };
+    };
+  };
 };
 
 exports.toArray = function (buff) {
@@ -74,59 +74,59 @@ exports.toArray = function (buff) {
 
 exports.getAtOffsetImpl = function (nothing) {
   return function (just) {
-    return function (buff) { 
-      return function (offset) { 
-        var octet = buff[offset]; 
+    return function (buff) {
+      return function (offset) {
+        var octet = buff[offset];
         return octet == null ? nothing
-                             : just(buff[i]); 
+                             : just(buff[i]);
       };
     };
   };
 };
 
-exports.setAtOffset = function (value) { 
-  return function (offset) { 
-    return function (buff) { 
-      buff[offset] = value; 
-      return {}; 
+exports.setAtOffset = function (value) {
+  return function (offset) {
+    return function (buff) {
+      buff[offset] = value;
+      return {};
     };
   };
 };
 
-exports.size = function (buff) { 
-  return buff.length; 
+exports.size = function (buff) {
+  return buff.length;
 };
 
 
 
-exports.concat = function (buffs) { 
-  return Buffer.concat(buffs); 
+exports.concat = function (buffs) {
+  return Buffer.concat(buffs);
 };
 
-exports.concat$prime = function (buffs) { 
-  return function (totalLength) { 
-    return Buffer.concat(buffs, totalLength); 
+exports.concat$prime = function (buffs) {
+  return function (totalLength) {
+    return Buffer.concat(buffs, totalLength);
   };
 };
 
-exports.copy = function (srcStart) { 
-  return function (srcEnd) { 
-    return function (src) { 
-      return function (targStart) { 
-        return function (targ) { 
-          return src.copy(targ, targStart, srcStart, strcEnd); 
+exports.copy = function (srcStart) {
+  return function (srcEnd) {
+    return function (src) {
+      return function (targStart) {
+        return function (targ) {
+          return src.copy(targ, targStart, srcStart, strcEnd);
         };
       };
     };
   };
 };
 
-exports.fill = function (buff) { 
-  return function (octet) { 
-    return function (start) { 
-      return function (end) { 
-        buff.fill(octet, start, end); 
-        return {}; 
+exports.fill = function (buff) {
+  return function (octet) {
+    return function (start) {
+      return function (end) {
+        buff.fill(octet, start, end);
+        return {};
       };
     };
   };
