@@ -151,14 +151,14 @@ exports.copy = function (srcStart) {
   };
 };
 
-exports.fill = function (buff) {
-  return function (octet) {
-    return function (start) {
-      return function (end) {
+exports.fill = function (octet) {
+  return function (start) {
+    return function (end) {
+      return function (buf) {
         return function() {
-          buff.fill(octet, start, end);
+          buf.fill(octet, start, end);
           return {};
-        }
+        };
       };
     };
   };
