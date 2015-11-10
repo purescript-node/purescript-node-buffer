@@ -8,23 +8,31 @@
 exports.showImpl = require('util').inspect;
 
 exports.create = function (size) {
-  return new Buffer(size);
+  return function() {
+    return new Buffer(size);
+  };
 };
 
 exports.fromArray = function (octets) {
-  return new Buffer(octets);
+  return function() {
+    return new Buffer(octets);
+  };
 };
 
 exports.fromStringImpl = function (str) {
   return function (encoding) {
-    return new Buffer(str, encoding);
+    return function() {
+      return new Buffer(str, encoding);
+    };
   };
 };
 
 exports.readImpl = function (ty) {
   return function (offset) {
     return function (buf) {
-      return buf['read' + ty](offset);
+      return function() {
+        return buf['read' + ty](offset);
+      };
     };
   };
 };
@@ -33,7 +41,9 @@ exports.readStringImpl = function (enc) {
   return function (start) {
     return function (end) {
       return function (buff) {
-        return buff.toString(enc, start, end);
+        return function() {
+          return buff.toString(enc, start, end);
+        };
       };
     };
   };
@@ -41,7 +51,9 @@ exports.readStringImpl = function (enc) {
 
 exports.toStringImpl = function (enc) {
   return function (buff) {
-    return buff.toString(enc);
+    return function() {
+      return buff.toString(enc);
+    };
   };
 };
 
@@ -73,16 +85,20 @@ exports.writeStringImpl = function (enc) {
 };
 
 exports.toArray = function (buff) {
-  return buff.toJSON();
+  return function() {
+    return buff.toJSON();
+  };
 };
 
 exports.getAtOffsetImpl = function (nothing) {
   return function (just) {
     return function (buff) {
       return function (offset) {
-        var octet = buff[offset];
-        return octet == null ? nothing
-                             : just(buff[i]);
+        return function() {
+          var octet = buff[offset];
+          return octet == null ? nothing
+                               : just(buff[i]);
+        };
       };
     };
   };
@@ -91,25 +107,33 @@ exports.getAtOffsetImpl = function (nothing) {
 exports.setAtOffset = function (value) {
   return function (offset) {
     return function (buff) {
-      buff[offset] = value;
-      return {};
+      return function() {
+        buff[offset] = value;
+        return {};
+      };
     };
   };
 };
 
 exports.size = function (buff) {
-  return buff.length;
+  return function() {
+    return buff.length;
+  };
 };
 
 
 
 exports.concat = function (buffs) {
-  return Buffer.concat(buffs);
+  return function() {
+    return Buffer.concat(buffs);
+  };
 };
 
-exports.concat$prime = function (buffs) {
+exports["concat'"] = function (buffs) {
   return function (totalLength) {
-    return Buffer.concat(buffs, totalLength);
+    return function() {
+      return Buffer.concat(buffs, totalLength);
+    };
   };
 };
 
@@ -118,7 +142,9 @@ exports.copy = function (srcStart) {
     return function (src) {
       return function (targStart) {
         return function (targ) {
-          return src.copy(targ, targStart, srcStart, strcEnd);
+          return function() {
+            return src.copy(targ, targStart, srcStart, strcEnd);
+          };
         };
       };
     };
