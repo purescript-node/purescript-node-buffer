@@ -143,7 +143,7 @@ exports.copy = function (srcStart) {
       return function (targStart) {
         return function (targ) {
           return function() {
-            return src.copy(targ, targStart, srcStart, strcEnd);
+            return src.copy(targ, targStart, srcStart, srcEnd);
           };
         };
       };
