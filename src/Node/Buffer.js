@@ -86,7 +86,7 @@ exports.writeStringImpl = function (enc) {
 
 exports.toArray = function (buff) {
   return function() {
-    return buff.toJSON();
+    return buff.toJSON().data;
   };
 };
 
