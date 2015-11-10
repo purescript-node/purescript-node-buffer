@@ -1,6 +1,7 @@
 module Test.Main where
 
 import Prelude
+import Data.Traversable (traverse)
 import Control.Monad.Eff
 import Control.Monad.Eff.Console (log, CONSOLE())
 import Test.Assert
@@ -37,6 +38,9 @@ main = do
 
   log "fill"
   testFill
+
+  log "concat'"
+  testConcat'
 
 testReadWrite :: Test
 testReadWrite = do
@@ -108,6 +112,14 @@ testFill = do
   out <- toArray buf
 
   assertEq [1,1,42,42,1] out
+
+testConcat' :: Test
+testConcat' = do
+  bufs <- traverse fromArray $ map (\x -> [x, x+1, x+2]) [0,3,6,9,12]
+  buf  <- concat' bufs 10
+  out  <- toArray buf
+
+  assertEq [0,1,2,3,4,5,6,7,8,9] out
 
 assertEq :: forall a. (Eq a, Show a) => a -> a -> Test
 assertEq x y =
