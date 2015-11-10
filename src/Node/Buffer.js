@@ -49,8 +49,10 @@ exports.writeImpl = function (ty) {
   return function (value) {
     return function (offset) {
       return function (buf) {
-        buf['write' + ty](value, offset);
-        return {};
+        return function() {
+          buf['write' + ty](value, offset);
+          return {};
+        }
       };
     };
   };
@@ -61,7 +63,9 @@ exports.writeStringImpl = function (enc) {
     return function (length) {
       return function (value) {
         return function (buff) {
-          return buff.write(value, offset, length, encoding);
+          return function() {
+            return buff.write(value, offset, length, encoding);
+          }
         };
       };
     };
@@ -125,8 +129,10 @@ exports.fill = function (buff) {
   return function (octet) {
     return function (start) {
       return function (end) {
-        buff.fill(octet, start, end);
-        return {};
+        return function() {
+          buff.fill(octet, start, end);
+          return {};
+        }
       };
     };
   };
