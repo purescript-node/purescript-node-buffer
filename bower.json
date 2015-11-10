@@ -11,5 +11,8 @@
   "dependencies": {
     "purescript-eff": "~0.1.0",
     "purescript-maybe": "~0.3.1"
+  },
+  "devDependencies": {
+    "purescript-assert": "~0.1.1"
   }
 }
