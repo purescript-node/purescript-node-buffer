@@ -32,6 +32,12 @@ main = do
   log "readString"
   testReadString
 
+  log "copy"
+  testCopy
+
+  log "fill"
+  testFill
+
 testReadWrite :: Test
 testReadWrite = do
   buf <- create 1
@@ -83,6 +89,25 @@ testReadString = do
   strOut <- readString ASCII 7 12 buf
 
   assertEq "world" strOut
+
+testCopy :: Test
+testCopy = do
+  buf1 <- fromArray [1,2,3,4,5]
+  buf2 <- fromArray [10,9,8,7,6]
+
+  copied <- copy 0 3 buf1 2 buf2
+  out    <- toArray buf2
+
+  assertEq copied 3
+  assertEq out [10,9,1,2,3]
+
+testFill :: Test
+testFill = do
+  buf <- fromArray [1,1,1,1,1]
+  fill 42 2 4 buf
+  out <- toArray buf
+
+  assertEq [1,1,42,42,1] out
 
 assertEq :: forall a. (Eq a, Show a) => a -> a -> Test
 assertEq x y =
