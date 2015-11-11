@@ -2,7 +2,7 @@ module Node.Buffer
   ( Octet()
   , Offset()
   , Buffer()
-  , BufferWrite()
+  , BUFFER()
   , BufferValueType(..)
   , create
   , fromArray
@@ -42,8 +42,8 @@ instance showBuffer :: Show Buffer where
 
 foreign import showImpl :: Buffer -> String
 
--- | Effect for buffer modification.
-foreign import data BufferWrite :: !
+-- | Effect for buffer creation, reading, or writing.
+foreign import data BUFFER :: !
 
 -- | Enumeration of the numeric types that can be written to a buffer.
 data BufferValueType
@@ -79,80 +79,81 @@ instance showBufferValueType :: Show BufferValueType where
   show DoubleBE = "DoubleBE"
 
 -- | Creates a new buffer of the specified size.
-foreign import create :: Int -> Buffer
+foreign import create :: forall e. Int -> Eff (buffer :: BUFFER | e) Buffer
 
 -- | Creates a new buffer from an array of octets, sized to match the array.
-foreign import fromArray :: Array Octet -> Buffer
+foreign import fromArray :: forall e. Array Octet -> Eff (buffer :: BUFFER | e) Buffer
 
 -- | Creates a new buffer from a string with the specified encoding, sized to
 -- | match the string.
-fromString :: String -> Encoding -> Buffer
+fromString :: forall e. String -> Encoding -> Eff (buffer :: BUFFER | e) Buffer
 fromString str = fromStringImpl str <<< show
 
-foreign import fromStringImpl :: String -> String -> Buffer
+foreign import fromStringImpl :: forall e. String -> String -> Eff (buffer :: BUFFER | e) Buffer
 
 -- | Reads a numeric value from a buffer at the specified offset.
-read :: BufferValueType -> Offset -> Buffer -> Int
+read :: forall e. BufferValueType -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Int
 read = readImpl <<< show
 
-foreign import readImpl :: String -> Offset -> Buffer -> Int
+foreign import readImpl :: forall e. String -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Int
 
 -- | Reads a section of a buffer as a string with the specified encoding.
-readString :: Encoding -> Offset -> Offset -> Buffer -> String
+readString :: forall e. Encoding -> Offset -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) String
 readString = readStringImpl <<< show
 
-foreign import readStringImpl :: String -> Offset -> Offset -> Buffer -> String
+foreign import readStringImpl ::
+  forall e. String -> Offset -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) String
 
 -- | Reads the buffer as a string with the specified encoding.
-toString :: Encoding -> Buffer -> String
+toString :: forall e. Encoding -> Buffer -> Eff (buffer :: BUFFER | e) String
 toString = toStringImpl <<< show
 
-foreign import toStringImpl :: String -> Buffer -> String
+foreign import toStringImpl :: forall e. String -> Buffer -> Eff (buffer :: BUFFER | e) String
 
 -- | Writes a numeric value to a buffer at the specified offset.
-write :: forall e. BufferValueType -> Int -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+write :: forall e. BufferValueType -> Int -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Unit
 write = writeImpl <<< show
 
 foreign import writeImpl ::
-  forall e. String -> Int -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+  forall e. String -> Int -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Unit
 
 -- | Writes octets from a string to a buffer at the specified offset. Multi-byte
 -- | characters will not be written to the buffer if there is not enough capacity
 -- | to write them fully. The number of bytes written is returned.
-writeString :: forall e. Encoding -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Int
+writeString :: forall e. Encoding -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BUFFER | e) Int
 writeString = writeStringImpl <<< show
 
 foreign import writeStringImpl ::
-  forall e. String -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Int
+  forall e. String -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BUFFER | e) Int
 
 -- | Creates an array of octets from a buffer's contents.
-foreign import toArray :: Buffer -> Array Octet
+foreign import toArray :: forall e. Buffer -> Eff (buffer :: BUFFER | e) (Array Octet)
 
 -- | Reads an octet from a buffer at the specified offset.
-getAtOffset :: Offset -> Buffer -> Maybe Octet
+getAtOffset :: forall e. Offset -> Buffer -> Eff (buffer :: BUFFER | e) (Maybe Octet)
 getAtOffset = getAtOffsetImpl Just Nothing
 
 foreign import getAtOffsetImpl ::
-  (Octet -> Maybe Octet) -> Maybe Octet -> Offset -> Buffer -> Maybe Octet
+  forall e. (Octet -> Maybe Octet) -> Maybe Octet -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) (Maybe Octet)
 
 -- | Writes an octet in the buffer at the specified offset.
 foreign import setAtOffset ::
-  forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+  forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Unit
 
 -- | Returns the size of a buffer.
-foreign import size :: Buffer -> Int
+foreign import size :: forall e. Buffer -> Eff (buffer :: BUFFER | e) Int
 
 -- | Concatenates a list of buffers.
-foreign import concat :: Array Buffer -> Buffer
+foreign import concat :: forall e. Array Buffer -> Eff (buffer :: BUFFER | e) Buffer
 
 -- | Concatenates a list of buffers, combining them into a new buffer of the
 -- | specified length.
-foreign import concat' :: Array Buffer -> Int -> Buffer
+foreign import concat' :: forall e. Array Buffer -> Int -> Eff (buffer :: BUFFER | e) Buffer
 
 -- | Copies a section of a source buffer into a target buffer at the specified
--- | offset.
-foreign import copy :: Offset -> Offset -> Buffer -> Offset -> Buffer -> Buffer
+-- | offset, and returns the number of octets copied.
+foreign import copy :: forall e. Offset -> Offset -> Buffer -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Int
 
 -- | Fills a range in a buffer with the specified octet.
 foreign import fill ::
-  forall e. Octet -> Offset -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+  forall e. Octet -> Offset -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Unit

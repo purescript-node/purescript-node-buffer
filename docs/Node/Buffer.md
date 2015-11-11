@@ -30,13 +30,13 @@ An instance of Node's Buffer class.
 instance showBuffer :: Show Buffer
 ```
 
-#### `BufferWrite`
+#### `BUFFER`
 
 ``` purescript
-data BufferWrite :: !
+data BUFFER :: !
 ```
 
-Effect for buffer modification.
+Effect for buffer creation, reading, or writing.
 
 #### `BufferValueType`
 
@@ -68,7 +68,7 @@ instance showBufferValueType :: Show BufferValueType
 #### `create`
 
 ``` purescript
-create :: Int -> Buffer
+create :: forall e. Int -> Eff (buffer :: BUFFER | e) Buffer
 ```
 
 Creates a new buffer of the specified size.
@@ -76,7 +76,7 @@ Creates a new buffer of the specified size.
 #### `fromArray`
 
 ``` purescript
-fromArray :: Array Octet -> Buffer
+fromArray :: forall e. Array Octet -> Eff (buffer :: BUFFER | e) Buffer
 ```
 
 Creates a new buffer from an array of octets, sized to match the array.
@@ -84,7 +84,7 @@ Creates a new buffer from an array of octets, sized to match the array.
 #### `fromString`
 
 ``` purescript
-fromString :: String -> Encoding -> Buffer
+fromString :: forall e. String -> Encoding -> Eff (buffer :: BUFFER | e) Buffer
 ```
 
 Creates a new buffer from a string with the specified encoding, sized to
@@ -93,7 +93,7 @@ match the string.
 #### `read`
 
 ``` purescript
-read :: BufferValueType -> Offset -> Buffer -> Int
+read :: forall e. BufferValueType -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Int
 ```
 
 Reads a numeric value from a buffer at the specified offset.
@@ -101,7 +101,7 @@ Reads a numeric value from a buffer at the specified offset.
 #### `readString`
 
 ``` purescript
-readString :: Encoding -> Offset -> Offset -> Buffer -> String
+readString :: forall e. Encoding -> Offset -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) String
 ```
 
 Reads a section of a buffer as a string with the specified encoding.
@@ -109,7 +109,7 @@ Reads a section of a buffer as a string with the specified encoding.
 #### `toString`
 
 ``` purescript
-toString :: Encoding -> Buffer -> String
+toString :: forall e. Encoding -> Buffer -> Eff (buffer :: BUFFER | e) String
 ```
 
 Reads the buffer as a string with the specified encoding.
@@ -117,7 +117,7 @@ Reads the buffer as a string with the specified encoding.
 #### `write`
 
 ``` purescript
-write :: forall e. BufferValueType -> Int -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+write :: forall e. BufferValueType -> Int -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Unit
 ```
 
 Writes a numeric value to a buffer at the specified offset.
@@ -125,7 +125,7 @@ Writes a numeric value to a buffer at the specified offset.
 #### `writeString`
 
 ``` purescript
-writeString :: forall e. Encoding -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BufferWrite | e) Int
+writeString :: forall e. Encoding -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BUFFER | e) Int
 ```
 
 Writes octets from a string to a buffer at the specified offset. Multi-byte
@@ -135,7 +135,7 @@ to write them fully. The number of bytes written is returned.
 #### `toArray`
 
 ``` purescript
-toArray :: Buffer -> Array Octet
+toArray :: forall e. Buffer -> Eff (buffer :: BUFFER | e) (Array Octet)
 ```
 
 Creates an array of octets from a buffer's contents.
@@ -143,7 +143,7 @@ Creates an array of octets from a buffer's contents.
 #### `getAtOffset`
 
 ``` purescript
-getAtOffset :: Offset -> Buffer -> Maybe Octet
+getAtOffset :: forall e. Offset -> Buffer -> Eff (buffer :: BUFFER | e) (Maybe Octet)
 ```
 
 Reads an octet from a buffer at the specified offset.
@@ -151,7 +151,7 @@ Reads an octet from a buffer at the specified offset.
 #### `setAtOffset`
 
 ``` purescript
-setAtOffset :: forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+setAtOffset :: forall e. Octet -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Unit
 ```
 
 Writes an octet in the buffer at the specified offset.
@@ -159,7 +159,7 @@ Writes an octet in the buffer at the specified offset.
 #### `size`
 
 ``` purescript
-size :: Buffer -> Int
+size :: forall e. Buffer -> Eff (buffer :: BUFFER | e) Int
 ```
 
 Returns the size of a buffer.
@@ -167,7 +167,7 @@ Returns the size of a buffer.
 #### `concat`
 
 ``` purescript
-concat :: Array Buffer -> Buffer
+concat :: forall e. Array Buffer -> Eff (buffer :: BUFFER | e) Buffer
 ```
 
 Concatenates a list of buffers.
@@ -175,7 +175,7 @@ Concatenates a list of buffers.
 #### `concat'`
 
 ``` purescript
-concat' :: Array Buffer -> Int -> Buffer
+concat' :: forall e. Array Buffer -> Int -> Eff (buffer :: BUFFER | e) Buffer
 ```
 
 Concatenates a list of buffers, combining them into a new buffer of the
@@ -184,16 +184,16 @@ specified length.
 #### `copy`
 
 ``` purescript
-copy :: Offset -> Offset -> Buffer -> Offset -> Buffer -> Buffer
+copy :: forall e. Offset -> Offset -> Buffer -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Int
 ```
 
 Copies a section of a source buffer into a target buffer at the specified
-offset.
+offset, and returns the number of octets copied.
 
 #### `fill`
 
 ``` purescript
-fill :: forall e. Octet -> Offset -> Offset -> Buffer -> Eff (buffer :: BufferWrite | e) Unit
+fill :: forall e. Octet -> Offset -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Unit
 ```
 
 Fills a range in a buffer with the specified octet.
