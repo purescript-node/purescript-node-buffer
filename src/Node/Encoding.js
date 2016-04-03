@@ -4,8 +4,8 @@
 
 // module Node.Encoding
 
-exports.byteLength = function (str) { 
-  return function (enc) { 
-    return Buffer.byteLength(str, enc); 
+exports.byteLengthImpl = function (str) {
+  return function (enc) {
+    return Buffer.byteLength(str, enc);
   };
 };
