@@ -1,7 +1,7 @@
 {
   "private": true,
   "devDependencies": {
-    "pulp": "^4.0.1",
+    "pulp": "^9.0.0",
     "rimraf": "^2.4.1"
   },
   "scripts": {
