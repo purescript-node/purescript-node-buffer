@@ -5,7 +5,7 @@
     "rimraf": "^2.4.1"
   },
   "scripts": {
-    "postinstall": "pulp dep install",
+    "postinstall": "bower install",
     "build": "pulp build && pulp test && rimraf docs && pulp docs"
   }
 }
