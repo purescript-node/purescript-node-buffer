@@ -15,7 +15,7 @@ data Encoding
 
 ##### Instances
 ``` purescript
-instance showEncoding :: Show Encoding
+Show Encoding
 ```
 
 #### `byteLength`
