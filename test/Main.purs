@@ -1,13 +1,12 @@
 module Test.Main where
 
 import Prelude
-import Data.Traversable (traverse)
-import Control.Monad.Eff
+import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log, CONSOLE())
-import Test.Assert
-
-import Node.Buffer
-import Node.Encoding
+import Data.Traversable (traverse)
+import Node.Buffer (BUFFER, BufferValueType(..), toArray, concat', fromArray, fill, copy, readString, fromString, toString, read, write, create)
+import Node.Encoding (Encoding(..))
+import Test.Assert (ASSERT, assert')
 
 type Test = forall e. Eff (assert :: ASSERT, buffer :: BUFFER, console :: CONSOLE | e) Unit
 
@@ -124,6 +123,6 @@ testConcat' = do
 assertEq :: forall a. (Eq a, Show a) => a -> a -> Test
 assertEq x y =
   if x == y
-    then return unit
-    else let msg = show x ++ " and " ++ show y ++ " were not equal."
+    then pure unit
+    else let msg = show x <> " and " <> show y <> " were not equal."
          in assert' msg false
