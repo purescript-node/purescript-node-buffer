@@ -3,8 +3,6 @@
 /* global require */
 "use strict";
 
-// module Node.Buffer
-
 exports.showImpl = require('util').inspect;
 
 exports.create = function (size) {

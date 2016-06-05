@@ -27,7 +27,7 @@ An instance of Node's Buffer class.
 
 ##### Instances
 ``` purescript
-instance showBuffer :: Show Buffer
+Show Buffer
 ```
 
 #### `BUFFER`
@@ -62,7 +62,7 @@ Enumeration of the numeric types that can be written to a buffer.
 
 ##### Instances
 ``` purescript
-instance showBufferValueType :: Show BufferValueType
+Show BufferValueType
 ```
 
 #### `create`
