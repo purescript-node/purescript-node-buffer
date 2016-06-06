@@ -25,7 +25,7 @@ module Node.Buffer
 import Prelude
 import Control.Monad.Eff (Eff)
 import Data.Maybe (Maybe(..))
-import Node.Encoding (Encoding)
+import Node.Encoding (Encoding, encodingToNode)
 
 -- | Type synonym indicating the value should be an octet (0-255). If the value
 -- | provided is outside this range it will be used as modulo 255.
