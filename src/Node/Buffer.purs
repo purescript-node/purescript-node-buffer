@@ -87,7 +87,7 @@ foreign import fromArray :: forall e. Array Octet -> Eff (buffer :: BUFFER | e) 
 -- | Creates a new buffer from a string with the specified encoding, sized to
 -- | match the string.
 fromString :: forall e. String -> Encoding -> Eff (buffer :: BUFFER | e) Buffer
-fromString str = fromStringImpl str <<< show
+fromString str = fromStringImpl str <<< encodingToNode
 
 foreign import fromStringImpl :: forall e. String -> String -> Eff (buffer :: BUFFER | e) Buffer
 
@@ -99,14 +99,14 @@ foreign import readImpl :: forall e. String -> Offset -> Buffer -> Eff (buffer :
 
 -- | Reads a section of a buffer as a string with the specified encoding.
 readString :: forall e. Encoding -> Offset -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) String
-readString = readStringImpl <<< show
+readString = readStringImpl <<< encodingToNode
 
 foreign import readStringImpl ::
   forall e. String -> Offset -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) String
 
 -- | Reads the buffer as a string with the specified encoding.
 toString :: forall e. Encoding -> Buffer -> Eff (buffer :: BUFFER | e) String
-toString = toStringImpl <<< show
+toString = toStringImpl <<< encodingToNode
 
 foreign import toStringImpl :: forall e. String -> Buffer -> Eff (buffer :: BUFFER | e) String
 
@@ -121,7 +121,7 @@ foreign import writeImpl ::
 -- | characters will not be written to the buffer if there is not enough capacity
 -- | to write them fully. The number of bytes written is returned.
 writeString :: forall e. Encoding -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BUFFER | e) Int
-writeString = writeStringImpl <<< show
+writeString = writeStringImpl <<< encodingToNode
 
 foreign import writeStringImpl ::
   forall e. String -> Offset -> Int -> String -> Buffer -> Eff (buffer :: BUFFER | e) Int
