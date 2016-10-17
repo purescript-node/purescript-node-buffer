@@ -2,8 +2,6 @@
 
 Type declarations and FFI wrappers for Node's Buffer class.
 
-## Module documentation
+## Documentation
 
-* [Node.Encoding](docs/Node/Encoding.md)
-* [Node.Buffer](docs/Node/Buffer.md)
-* [Node.Buffer.Unsafe](docs/Node/Buffer/Unsafe.md)
+Module documentation is [published on Pursuit](https://pursuit.purescript.org/packages/purescript-node-buffer).
