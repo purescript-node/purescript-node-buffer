@@ -89,14 +89,14 @@ exports.toArray = function (buff) {
   };
 };
 
-exports.getAtOffsetImpl = function (nothing) {
-  return function (just) {
-    return function (buff) {
-      return function (offset) {
+exports.getAtOffsetImpl = function (just) {
+  return function (nothing) {
+    return function (offset) {
+      return function (buff) {
         return function() {
           var octet = buff[offset];
           return octet == null ? nothing
-                               : just(buff[i]);
+                               : just(octet);
         };
       };
     };
