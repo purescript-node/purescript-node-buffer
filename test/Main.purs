@@ -3,8 +3,9 @@ module Test.Main where
 import Prelude
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log, CONSOLE())
+import Data.Maybe (Maybe(..))
 import Data.Traversable (traverse)
-import Node.Buffer (BUFFER, BufferValueType(..), toArray, concat', fromArray, fill, copy, readString, fromString, toString, read, write, create)
+import Node.Buffer (BUFFER, BufferValueType(..), toArray, concat', fromArray, fill, copy, readString, fromString, toString, read, write, create, getAtOffset)
 import Node.Encoding (Encoding(..))
 import Test.Assert (ASSERT, assert')
 
@@ -40,6 +41,9 @@ main = do
 
   log "concat'"
   testConcat'
+
+  log "getAtOffset"
+  testGetAtOffset
 
 testReadWrite :: Test
 testReadWrite = do
@@ -119,6 +123,13 @@ testConcat' = do
   out  <- toArray buf
 
   assertEq [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14] out
+
+testGetAtOffset :: Test
+testGetAtOffset = do
+  buf  <- fromArray [1, 2, 3, 4]
+  assertEq (Just 2) =<< getAtOffset 1 buf
+  assertEq Nothing  =<< getAtOffset 4 buf
+  assertEq Nothing  =<< getAtOffset (-1) buf
 
 assertEq :: forall a. (Eq a, Show a) => a -> a -> Test
 assertEq x y =

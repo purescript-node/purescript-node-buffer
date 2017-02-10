@@ -28,7 +28,7 @@ import Data.Maybe (Maybe(..))
 import Node.Encoding (Encoding, encodingToNode)
 
 -- | Type synonym indicating the value should be an octet (0-255). If the value
--- | provided is outside this range it will be used as modulo 255.
+-- | provided is outside this range it will be used as modulo 256.
 type Octet = Int
 
 -- | Type synonym indicating the value refers to an offset in a buffer.
