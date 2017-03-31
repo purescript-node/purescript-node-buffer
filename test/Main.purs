@@ -131,7 +131,7 @@ testGetAtOffset = do
   assertEq Nothing  =<< getAtOffset 4 buf
   assertEq Nothing  =<< getAtOffset (-1) buf
 
-assertEq :: forall a. (Eq a, Show a) => a -> a -> Test
+assertEq :: forall a. Eq a => Show a => a -> a -> Test
 assertEq x y =
   if x == y
     then pure unit
