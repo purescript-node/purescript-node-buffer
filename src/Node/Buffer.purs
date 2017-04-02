@@ -23,7 +23,8 @@ module Node.Buffer
   ) where
 
 import Prelude
-import Control.Monad.Eff (Eff)
+import Prim (kind Type)
+import Control.Monad.Eff (Eff, kind Effect)
 import Data.Maybe (Maybe(..))
 import Node.Encoding (Encoding, encodingToNode)
 
@@ -35,7 +36,7 @@ type Octet = Int
 type Offset = Int
 
 -- | An instance of Node's Buffer class.
-foreign import data Buffer :: *
+foreign import data Buffer :: Type
 
 instance showBuffer :: Show Buffer where
   show = showImpl
@@ -43,7 +44,7 @@ instance showBuffer :: Show Buffer where
 foreign import showImpl :: Buffer -> String
 
 -- | Effect for buffer creation, reading, or writing.
-foreign import data BUFFER :: !
+foreign import data BUFFER :: Effect
 
 -- | Enumeration of the numeric types that can be written to a buffer.
 data BufferValueType
