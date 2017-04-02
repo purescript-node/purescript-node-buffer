@@ -23,7 +23,6 @@ module Node.Buffer
   ) where
 
 import Prelude
-import Prim (kind Type)
 import Control.Monad.Eff (Eff, kind Effect)
 import Data.Maybe (Maybe(..))
 import Node.Encoding (Encoding, encodingToNode)
