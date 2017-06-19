@@ -68,7 +68,7 @@ exports.writeImpl = function (ty) {
   };
 };
 
-exports.writeStringImpl = function (enc) {
+exports.writeStringImpl = function (encoding) {
   return function (offset) {
     return function (length) {
       return function (value) {
