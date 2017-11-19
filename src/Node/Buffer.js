@@ -25,6 +25,12 @@ exports.fromStringImpl = function (str) {
   };
 };
 
+exports.toArrayBuffer = function(buff) {
+  return function() {
+    return buff.buffer.slice(buff.byteOffset, buff.byteOffset + buff.byteLength);
+  };
+};
+
 exports.readImpl = function (ty) {
   return function (offset) {
     return function (buf) {

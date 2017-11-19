@@ -7,6 +7,7 @@ module Node.Buffer
   , create
   , fromArray
   , fromString
+  , toArrayBuffer
   , read
   , readString
   , toString
@@ -23,7 +24,9 @@ module Node.Buffer
   ) where
 
 import Prelude
+
 import Control.Monad.Eff (Eff, kind Effect)
+import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Maybe (Maybe(..))
 import Node.Encoding (Encoding, encodingToNode)
 
@@ -90,6 +93,8 @@ fromString :: forall e. String -> Encoding -> Eff (buffer :: BUFFER | e) Buffer
 fromString str = fromStringImpl str <<< encodingToNode
 
 foreign import fromStringImpl :: forall e. String -> String -> Eff (buffer :: BUFFER | e) Buffer
+
+foreign import toArrayBuffer :: forall e. Buffer -> Eff (buffer :: BUFFER | e) ArrayBuffer
 
 -- | Reads a numeric value from a buffer at the specified offset.
 read :: forall e. BufferValueType -> Offset -> Buffer -> Eff (buffer :: BUFFER | e) Int
