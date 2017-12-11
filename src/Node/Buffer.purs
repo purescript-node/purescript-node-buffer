@@ -7,6 +7,7 @@ module Node.Buffer
   , create
   , fromArray
   , fromString
+  , fromArrayBuffer
   , toArrayBuffer
   , read
   , readString
@@ -86,6 +87,11 @@ foreign import create :: forall e. Int -> Eff (buffer :: BUFFER | e) Buffer
 
 -- | Creates a new buffer from an array of octets, sized to match the array.
 foreign import fromArray :: forall e. Array Octet -> Eff (buffer :: BUFFER | e) Buffer
+
+-- | Creates a buffer view from a JS ArrayByffer without copying data.
+--
+-- Requires Node >= v5.10.0
+foreign import fromArrayBuffer :: forall e. ArrayBuffer -> Eff (buffer :: BUFFER | e) Buffer
 
 -- | Creates a new buffer from a string with the specified encoding, sized to
 -- | match the string.
