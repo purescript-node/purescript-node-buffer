@@ -1,15 +1,15 @@
 module Test.Main where
 
 import Prelude
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (log, CONSOLE())
+import Effect (Effect)
+import Effect.Console (log)
 import Data.Maybe (Maybe(..))
 import Data.Traversable (traverse)
-import Node.Buffer (BUFFER, BufferValueType(..), toArray, concat', fromArray, fill, copy, readString, fromString, toString, read, write, create, getAtOffset)
+import Node.Buffer (BufferValueType(..), toArray, concat', fromArray, fill, copy, readString, fromString, toString, read, write, create, getAtOffset)
 import Node.Encoding (Encoding(..))
-import Test.Assert (ASSERT, assert')
+import Test.Assert (assert')
 
-type Test = forall e. Eff (assert :: ASSERT, buffer :: BUFFER, console :: CONSOLE | e) Unit
+type Test = Effect Unit
 
 main :: Test
 main = do
