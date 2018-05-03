@@ -7,20 +7,20 @@ exports.showImpl = require('util').inspect;
 
 exports.create = function (size) {
   return function() {
-    return new Buffer(size);
+    return Buffer.alloc(size);
   };
 };
 
 exports.fromArray = function (octets) {
   return function() {
-    return new Buffer(octets);
+    return Buffer.from(octets);
   };
 };
 
 exports.fromStringImpl = function (str) {
   return function (encoding) {
     return function() {
-      return new Buffer(str, encoding);
+      return Buffer.from(str, encoding);
     };
   };
 };
