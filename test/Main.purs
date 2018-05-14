@@ -11,7 +11,7 @@ import Test.Assert (assert')
 
 main :: Effect Unit
 main = do
-  log "Effect Uniting..."
+  log "Testing..."
 
   log "Reading and writing"
   testReadWrite
