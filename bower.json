@@ -13,13 +13,13 @@
     "url": "git://github.com/purescript-node/purescript-node-buffer"
   },
   "dependencies": {
-    "purescript-eff": "^3.0.0",
-    "purescript-maybe": "^3.0.0",
+    "purescript-effect": "^2.0.0",
+    "purescript-maybe": "^4.0.0",
     "purescript-arraybuffer-types": "^2.0.0"
   },
   "devDependencies": {
-    "purescript-assert": "^3.0.0",
-    "purescript-console": "^3.0.0",
-    "purescript-foldable-traversable": "^3.0.0"
+    "purescript-assert": "^4.0.0",
+    "purescript-console": "^4.1.0",
+    "purescript-foldable-traversable": "^4.0.0"
   }
 }
