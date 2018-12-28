@@ -2,13 +2,13 @@
 /* global Buffer */
 "use strict";
 
-exports.copyImpl = function(a) {
+exports.copyAllImpl = function(a) {
   return function() {
     return Buffer.from(a);
   };
 };
 
-exports.writeImpl = function (ty) {
+exports.writeInternal = function (ty) {
   return function (value) {
     return function (offset) {
       return function (buf) {
@@ -21,7 +21,7 @@ exports.writeImpl = function (ty) {
   };
 };
 
-exports.writeStringImpl = function (encoding) {
+exports.writeStringInternal = function (encoding) {
   return function (offset) {
     return function (length) {
       return function (value) {
@@ -35,7 +35,7 @@ exports.writeStringImpl = function (encoding) {
   };
 };
 
-exports.setAtOffset = function (value) {
+exports.setAtOffsetImpl = function (value) {
   return function (offset) {
     return function (buff) {
       return function() {
@@ -46,7 +46,7 @@ exports.setAtOffset = function (value) {
   };
 };
 
-exports.copy = function (srcStart) {
+exports.copyImpl = function (srcStart) {
   return function (srcEnd) {
     return function (src) {
       return function (targStart) {
@@ -60,7 +60,7 @@ exports.copy = function (srcStart) {
   };
 };
 
-exports.fill = function (octet) {
+exports.fillImpl = function (octet) {
   return function (start) {
     return function (end) {
       return function (buf) {
