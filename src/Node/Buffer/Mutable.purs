@@ -37,74 +37,74 @@ import Node.Buffer as Buffer
 import Node.Encoding (Encoding, encodingToNode)
 import Unsafe.Coerce (unsafeCoerce)
 
--- | A type class for mutable buffers `b` where operations on those buffers are
--- | represented by a particular effect type `e`.
-class MutableBuffer b e | e -> b, b -> e where
+-- | A type class for mutable buffers `buf` where operations on those buffers are
+-- | represented by a particular monadic effect type `m`.
+class Monad m <= MutableBuffer buf m | m -> buf, buf -> m where
 
   -- | Creates a new buffer of the specified size.
-  create :: Int -> e b
+  create :: Int -> m buf
 
   -- | Creates an immutable copy of a mutable buffer.
-  freeze :: b -> e Buffer
+  freeze :: buf -> m Buffer
 
   -- | Creates a mutable copy of an immutable buffer.
-  thaw :: Buffer -> e b
+  thaw :: Buffer -> m buf
 
   -- | Creates a new buffer from an array of octets, sized to match the array.
-  fromArray :: Array Octet -> e b
+  fromArray :: Array Octet -> m buf
 
   -- | Creates a new buffer from a string with the specified encoding, sized to
   -- | match the string.
-  fromString :: String -> Encoding -> e b
+  fromString :: String -> Encoding -> m buf
 
   -- | Creates a buffer view from a JS ArrayByffer without copying data.
-  fromArrayBuffer :: ArrayBuffer -> e b
+  fromArrayBuffer :: ArrayBuffer -> m buf
 
   -- | Copies the data in the buffer to a new JS ArrayBuffer
-  toArrayBuffer :: b -> e ArrayBuffer
+  toArrayBuffer :: buf -> m ArrayBuffer
 
   -- | Reads a numeric value from a buffer at the specified offset.
-  read :: BufferValueType -> Offset -> b -> e Int
+  read :: BufferValueType -> Offset -> buf -> m Int
 
   -- | Reads a section of a buffer as a string with the specified encoding.
-  readString :: Encoding -> Offset -> Offset -> b -> e String
+  readString :: Encoding -> Offset -> Offset -> buf -> m String
 
   -- | Reads the buffer as a string with the specified encoding.
-  toString :: Encoding -> b -> e String
+  toString :: Encoding -> buf -> m String
 
   -- | Writes a numeric value to a buffer at the specified offset.
-  write :: BufferValueType -> Int -> Offset -> b -> e Unit
+  write :: BufferValueType -> Int -> Offset -> buf -> m Unit
 
   -- | Writes octets from a string to a buffer at the specified offset. Multi-byte
   -- | characters will not be written to the buffer if there is not enough capacity
   -- | to write them fully. The number of bytes written is returned.
-  writeString :: Encoding -> Offset -> Int -> String -> b -> e Int
+  writeString :: Encoding -> Offset -> Int -> String -> buf -> m Int
 
   -- | Creates an array of octets from a buffer's contents.
-  toArray :: b -> e (Array Octet)
+  toArray :: buf -> m (Array Octet)
 
   -- | Reads an octet from a buffer at the specified offset.
-  getAtOffset :: Offset -> b -> e (Maybe Octet)
+  getAtOffset :: Offset -> buf -> m (Maybe Octet)
 
   -- | Writes an octet in the buffer at the specified offset.
-  setAtOffset :: Octet -> Offset -> b -> e Unit
+  setAtOffset :: Octet -> Offset -> buf -> m Unit
 
   -- | Returns the size of a buffer.
-  size :: b -> e Int
+  size :: buf -> m Int
 
   -- | Concatenates a list of buffers.
-  concat :: Array b -> e b
+  concat :: Array buf -> m buf
 
   -- | Concatenates a list of buffers, combining them into a new buffer of the
   -- | specified length.
-  concat' :: Array b -> Int -> e b
+  concat' :: Array buf -> Int -> m buf
 
   -- | Copies a section of a source buffer into a target buffer at the specified
   -- | offset, and returns the number of octets copied.
-  copy :: Offset -> Offset -> b -> Offset -> b -> e Int
+  copy :: Offset -> Offset -> buf -> Offset -> buf -> m Int
 
   -- | Fills a range in a buffer with the specified octet.
-  fill :: Octet -> Offset -> Offset -> b -> e Unit
+  fill :: Octet -> Offset -> Offset -> buf -> m Unit
 
 -- | A reference to a mutable buffer for use with `Effect`
 foreign import data EffectBuffer :: Type
@@ -163,66 +163,66 @@ instance mutableBufferST :: MutableBuffer (STBuffer h) (ST h) where
   copy = copyImpl
   fill = fillImpl
 
-usingFromFrozen :: forall b e a. (Buffer -> a) -> b -> e a
+usingFromFrozen :: forall buf m a. (Buffer -> a) -> buf -> m a
 usingFromFrozen f buf = unsafeCoerce \_ -> f $ unsafeCoerce buf
 
-usingToFrozen :: forall b e a. (a -> Buffer) -> a -> e b
+usingToFrozen :: forall buf m a. (a -> Buffer) -> a -> m buf
 usingToFrozen f x = unsafeCoerce \_ -> unsafeCoerce $ f x
 
-createImpl :: forall b e. Int -> e b
+createImpl :: forall buf m. Int -> m buf
 createImpl = usingToFrozen Buffer.create
 
-foreign import copyAllImpl :: forall a b e. a -> e b
+foreign import copyAllImpl :: forall a buf m. a -> m buf
 
-fromArrayImpl :: forall b e. Array Octet -> e b
+fromArrayImpl :: forall buf m. Array Octet -> m buf
 fromArrayImpl = usingToFrozen Buffer.fromArray
 
-fromStringImpl :: forall b e. String -> Encoding -> e b
+fromStringImpl :: forall buf m. String -> Encoding -> m buf
 fromStringImpl s = usingToFrozen $ Buffer.fromString s
 
-fromArrayBufferImpl :: forall b e. ArrayBuffer -> e b
+fromArrayBufferImpl :: forall buf m. ArrayBuffer -> m buf
 fromArrayBufferImpl = usingToFrozen Buffer.fromArrayBuffer
 
-toArrayBufferImpl :: forall b e. b -> e ArrayBuffer
+toArrayBufferImpl :: forall buf m. buf -> m ArrayBuffer
 toArrayBufferImpl = usingFromFrozen Buffer.toArrayBuffer
 
-readImpl :: forall b e. BufferValueType -> Offset -> b -> e Int
+readImpl :: forall buf m. BufferValueType -> Offset -> buf -> m Int
 readImpl t o = usingFromFrozen $ Buffer.read t o
 
-readStringImpl :: forall b e. Encoding -> Offset -> Offset -> b -> e String
-readStringImpl e o o' = usingFromFrozen $ Buffer.readString e o o'
+readStringImpl :: forall buf m. Encoding -> Offset -> Offset -> buf -> m String
+readStringImpl m o o' = usingFromFrozen $ Buffer.readString m o o'
 
-toStringImpl :: forall b e. Encoding -> b -> e String
-toStringImpl e = usingFromFrozen $ Buffer.toString e
+toStringImpl :: forall buf m. Encoding -> buf -> m String
+toStringImpl m = usingFromFrozen $ Buffer.toString m
 
-writeImpl :: forall b e. BufferValueType -> Int -> Offset -> b -> e Unit
+writeImpl :: forall buf m. BufferValueType -> Int -> Offset -> buf -> m Unit
 writeImpl = writeInternal <<< show
 
-foreign import writeInternal :: forall b e. String -> Int -> Offset -> b -> e Unit
+foreign import writeInternal :: forall buf m. String -> Int -> Offset -> buf -> m Unit
 
-writeStringImpl :: forall b e. Encoding -> Offset -> Int -> String -> b -> e Int
+writeStringImpl :: forall buf m. Encoding -> Offset -> Int -> String -> buf -> m Int
 writeStringImpl = writeStringInternal <<< encodingToNode
 
 foreign import writeStringInternal ::
-  forall b e. String -> Offset -> Int -> String -> b -> e Int
+  forall buf m. String -> Offset -> Int -> String -> buf -> m Int
 
-toArrayImpl :: forall b e. b -> e (Array Octet)
+toArrayImpl :: forall buf m. buf -> m (Array Octet)
 toArrayImpl = usingFromFrozen Buffer.toArray
 
-getAtOffsetImpl :: forall b e. Offset -> b -> e (Maybe Octet)
+getAtOffsetImpl :: forall buf m. Offset -> buf -> m (Maybe Octet)
 getAtOffsetImpl o = usingFromFrozen $ Buffer.getAtOffset o
 
-foreign import setAtOffsetImpl :: forall b e. Octet -> Offset -> b -> e Unit
+foreign import setAtOffsetImpl :: forall buf m. Octet -> Offset -> buf -> m Unit
 
-sizeImpl :: forall b e. b -> e Int
+sizeImpl :: forall buf m. buf -> m Int
 sizeImpl = usingFromFrozen Buffer.size
 
-concatImpl :: forall b e. Array b -> e b
+concatImpl :: forall buf m. Array buf -> m buf
 concatImpl arrs = unsafeCoerce \_ -> Buffer.concat (unsafeCoerce arrs)
 
-concatImpl' :: forall b e. Array b -> Int -> e b
+concatImpl' :: forall buf m. Array buf -> Int -> m buf
 concatImpl' arrs n = unsafeCoerce \_ -> Buffer.concat' (unsafeCoerce arrs) n
 
-foreign import copyImpl :: forall b e. Offset -> Offset -> b -> Offset -> b -> e Int
+foreign import copyImpl :: forall buf m. Offset -> Offset -> buf -> Offset -> buf -> m Int
 
-foreign import fillImpl :: forall b e. Octet -> Offset -> Offset -> b -> e Unit
+foreign import fillImpl :: forall buf m. Octet -> Offset -> Offset -> buf -> m Unit

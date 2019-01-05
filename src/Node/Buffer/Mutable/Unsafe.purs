@@ -11,14 +11,14 @@ import Node.Buffer (Offset)
 import Node.Buffer.Mutable (class MutableBuffer, EffectBuffer, STBuffer)
 import Unsafe.Coerce (unsafeCoerce)
 
-class MutableBuffer b e <= MutableBufferUnsafe b e | b -> e, e -> b where
+class MutableBuffer buf m <= MutableBufferUnsafe buf m | buf -> m, m -> buf where
 
   -- | Creates a new buffer slice that acts like a window on the original buffer.
   -- | Writing to the slice buffer updates the original buffer and vice-versa.
   -- |
   -- | This is considered unsafe as writing to a slice can result in action at a
   -- | distance.
-  slice :: Offset -> Offset -> b -> b
+  slice :: Offset -> Offset -> buf -> buf
 
 instance mutableBufferUnsafeEffect :: MutableBufferUnsafe EffectBuffer Effect where
   slice = sliceImpl
@@ -26,5 +26,5 @@ instance mutableBufferUnsafeEffect :: MutableBufferUnsafe EffectBuffer Effect wh
 instance mutableBufferUnsafeST :: MutableBufferUnsafe (STBuffer h) (ST h) where
   slice = sliceImpl
 
-sliceImpl :: forall b. Offset -> Offset -> b -> b
+sliceImpl :: forall buf. Offset -> Offset -> buf -> buf
 sliceImpl = unsafeCoerce Buffer.slice

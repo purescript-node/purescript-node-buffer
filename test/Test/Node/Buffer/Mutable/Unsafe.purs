@@ -19,8 +19,8 @@ test = do
   log "Testing Node.Buffer.Mutable.Unsafe [STBuffer] ..."
   testMutableBufferUnsafe (Proxy :: Proxy (STBuffer _)) (unsafeCoerce ST.run >>> pure)
 
-testMutableBufferUnsafe :: forall b e. Monad e => MutableBufferUnsafe b e =>
-  Proxy b -> (forall a. e a -> Effect a) -> Effect Unit
+testMutableBufferUnsafe :: forall buf m. MutableBufferUnsafe buf m =>
+  Proxy buf -> (forall a. m a -> Effect a) -> Effect Unit
 testMutableBufferUnsafe _ run = do
 
   log " - slice"
@@ -30,8 +30,8 @@ testMutableBufferUnsafe _ run = do
     testSlice :: Effect Unit
     testSlice = do
       {bufArr, bufSliceArr} <- run do
-        buf <- fromArray [1, 2, 3, 4] :: e b
-        let bufSlice = slice 1 3 buf :: b
+        buf <- fromArray [1, 2, 3, 4] :: m buf
+        let bufSlice = slice 1 3 buf :: buf
         setAtOffset 42 1 bufSlice
         bufArr <- toArray buf
         bufSliceArr <- toArray bufSlice
