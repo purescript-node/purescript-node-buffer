@@ -15,6 +15,7 @@ module Node.Buffer.Mutable
  , toArray
  , getAtOffset
  , setAtOffset
+ , slice
  , size
  , concat
  , concat'
@@ -89,6 +90,10 @@ class Monad m <= MutableBuffer buf m | m -> buf, buf -> m where
   -- | Writes an octet in the buffer at the specified offset.
   setAtOffset :: Octet -> Offset -> buf -> m Unit
 
+  -- | Creates a new buffer slice that acts like a window on the original buffer.
+  -- | Writing to the slice buffer updates the original buffer and vice-versa.
+  slice :: Offset -> Offset -> buf -> buf
+
   -- | Returns the size of a buffer.
   size :: buf -> m Int
 
@@ -135,6 +140,7 @@ instance mutableBufferEffect :: MutableBuffer EffectBuffer Effect where
   toArray = toArrayImpl
   getAtOffset = getAtOffsetImpl
   setAtOffset = setAtOffsetImpl
+  slice = sliceImpl
   size = sizeImpl
   concat = concatImpl
   concat' = concatImpl'
@@ -157,6 +163,7 @@ instance mutableBufferST :: MutableBuffer (STBuffer h) (ST h) where
   toArray = toArrayImpl
   getAtOffset = getAtOffsetImpl
   setAtOffset = setAtOffsetImpl
+  slice = sliceImpl
   size = sizeImpl
   concat = concatImpl
   concat' = concatImpl'
@@ -213,6 +220,9 @@ getAtOffsetImpl :: forall buf m. Offset -> buf -> m (Maybe Octet)
 getAtOffsetImpl o = usingFromFrozen $ Buffer.getAtOffset o
 
 foreign import setAtOffsetImpl :: forall buf m. Octet -> Offset -> buf -> m Unit
+
+sliceImpl :: forall buf. Offset -> Offset -> buf -> buf
+sliceImpl = unsafeCoerce Buffer.slice
 
 sizeImpl :: forall buf m. buf -> m Int
 sizeImpl = usingFromFrozen Buffer.size

@@ -9,10 +9,9 @@ import Effect (Effect)
 import Effect.Console (log)
 import Node.Buffer (BufferValueType(..))
 import Node.Buffer as Buffer
-import Node.Buffer.Mutable (class MutableBuffer, EffectBuffer, STBuffer, concat', copy, create, fill, freeze, fromArray, fromArrayBuffer, toArrayBuffer, fromString, getAtOffset, read, readString, runST, thaw, toArray, toString, write)
+import Node.Buffer.Mutable (class MutableBuffer, EffectBuffer, STBuffer, concat', copy, create, fill, freeze, fromArray, fromArrayBuffer, toArrayBuffer, fromString, getAtOffset, setAtOffset, read, readString, runST, thaw, toArray, toString, write, slice)
 import Node.Encoding (Encoding(..))
 import Test.Assert (assertEqual)
-import Test.Node.Buffer.Mutable.Unsafe as Unsafe
 import Type.Proxy (Proxy(..))
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -26,8 +25,6 @@ test = do
   testMutableBuffer (Proxy :: Proxy (STBuffer _)) (unsafeCoerce ST.run >>> pure)
   log " - runST"
   testRunSt
-
-  Unsafe.test
 
 testMutableBuffer :: forall buf m. MutableBuffer buf m =>
   Proxy buf -> (forall a. m a -> Effect a) -> Effect Unit
@@ -62,6 +59,9 @@ testMutableBuffer _ run = do
 
   log " - readString"
   testReadString
+
+  log " - slice"
+  testSlice
 
   log " - copy"
   testCopy
@@ -153,6 +153,19 @@ testMutableBuffer _ run = do
         readString ASCII 7 12 buf
 
       assertEqual {expected: "world", actual: strOut}
+
+    testSlice :: Effect Unit
+    testSlice = do
+      {bufArr, bufSliceArr} <- run do
+        buf <- fromArray [1, 2, 3, 4] :: m buf
+        let bufSlice = slice 1 3 buf :: buf
+        setAtOffset 42 1 bufSlice
+        bufArr <- toArray buf
+        bufSliceArr <- toArray bufSlice
+        pure {bufArr, bufSliceArr}
+
+      assertEqual {expected: [1, 2, 42, 4], actual: bufArr}
+      assertEqual {expected: [2, 42], actual: bufSliceArr}
 
     testCopy :: Effect Unit
     testCopy = do
