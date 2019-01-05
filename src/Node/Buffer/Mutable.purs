@@ -2,7 +2,9 @@ module Node.Buffer.Mutable
  ( class MutableBuffer
  , create
  , freeze
+ , unsafeFreeze
  , thaw
+ , unsafeThaw
  , fromArray
  , fromString
  , fromArrayBuffer
@@ -48,8 +50,16 @@ class Monad m <= MutableBuffer buf m | m -> buf, buf -> m where
   -- | Creates an immutable copy of a mutable buffer.
   freeze :: buf -> m Buffer
 
+-- | O(1). Convert a mutable buffer to an immutable buffer, without copying. The
+-- | mutable buffer must not be mutated afterwards.
+  unsafeFreeze :: buf -> m Buffer
+
   -- | Creates a mutable copy of an immutable buffer.
   thaw :: Buffer -> m buf
+
+  -- | O(1) Convert an immutable buffer to a mutable buffer, without copying. The
+  -- | input buffer must not be used afterward.
+  unsafeThaw :: Buffer -> m buf
 
   -- | Creates a new buffer from an array of octets, sized to match the array.
   fromArray :: Array Octet -> m buf
@@ -121,13 +131,15 @@ foreign import data STBuffer :: Region -> Type
 
 -- | Runs an effect creating an `STBuffer` then freezes the buffer and returns
 -- | it, without unneccessary copying.
-runST :: forall h. ST h (STBuffer h) -> Buffer
-runST st = ST.run (unsafeCoerce st)
+runST :: (forall h. ST h (STBuffer h)) -> Buffer
+runST st = ST.run (st >>= unsafeFreeze)
 
 instance mutableBufferEffect :: MutableBuffer EffectBuffer Effect where
   create = createImpl
   freeze = copyAllImpl
+  unsafeFreeze = unsafeFreezeImpl
   thaw = copyAllImpl
+  unsafeThaw = unsafeThawImpl
   fromArray = fromArrayImpl
   fromString = fromStringImpl
   fromArrayBuffer = fromArrayBufferImpl
@@ -150,7 +162,9 @@ instance mutableBufferEffect :: MutableBuffer EffectBuffer Effect where
 instance mutableBufferST :: MutableBuffer (STBuffer h) (ST h) where
   create = createImpl
   freeze = copyAllImpl
+  unsafeFreeze = unsafeFreezeImpl
   thaw = copyAllImpl
+  unsafeThaw = unsafeThawImpl
   fromArray = fromArrayImpl
   fromString = fromStringImpl
   fromArrayBuffer = fromArrayBufferImpl
@@ -170,53 +184,59 @@ instance mutableBufferST :: MutableBuffer (STBuffer h) (ST h) where
   copy = copyImpl
   fill = fillImpl
 
-usingFromFrozen :: forall buf m a. (Buffer -> a) -> buf -> m a
-usingFromFrozen f buf = unsafeCoerce \_ -> f $ unsafeCoerce buf
+unsafeFreezeImpl :: forall buf m. Monad m => buf -> m Buffer
+unsafeFreezeImpl = pure <<< unsafeCoerce
 
-usingToFrozen :: forall buf m a. (a -> Buffer) -> a -> m buf
-usingToFrozen f x = unsafeCoerce \_ -> unsafeCoerce $ f x
+unsafeThawImpl :: forall buf m. Monad m => Buffer -> m buf
+unsafeThawImpl = pure <<< unsafeCoerce
 
-createImpl :: forall buf m. Int -> m buf
+usingFromFrozen :: forall buf m a. Monad m => (Buffer -> a) -> buf -> m a
+usingFromFrozen f buf = f <$> unsafeFreezeImpl buf
+
+usingToFrozen :: forall buf m a. Monad m => (a -> Buffer) -> a -> m buf
+usingToFrozen f x = unsafeThawImpl $ f x
+
+createImpl :: forall buf m. Monad m => Int -> m buf
 createImpl = usingToFrozen Buffer.create
 
 foreign import copyAllImpl :: forall a buf m. a -> m buf
 
-fromArrayImpl :: forall buf m. Array Octet -> m buf
+fromArrayImpl :: forall buf m. Monad m => Array Octet -> m buf
 fromArrayImpl = usingToFrozen Buffer.fromArray
 
-fromStringImpl :: forall buf m. String -> Encoding -> m buf
+fromStringImpl :: forall buf m. Monad m => String -> Encoding -> m buf
 fromStringImpl s = usingToFrozen $ Buffer.fromString s
 
-fromArrayBufferImpl :: forall buf m. ArrayBuffer -> m buf
+fromArrayBufferImpl :: forall buf m. Monad m => ArrayBuffer -> m buf
 fromArrayBufferImpl = usingToFrozen Buffer.fromArrayBuffer
 
-toArrayBufferImpl :: forall buf m. buf -> m ArrayBuffer
+toArrayBufferImpl :: forall buf m. Monad m => buf -> m ArrayBuffer
 toArrayBufferImpl = usingFromFrozen Buffer.toArrayBuffer
 
-readImpl :: forall buf m. BufferValueType -> Offset -> buf -> m Int
+readImpl :: forall buf m. Monad m => BufferValueType -> Offset -> buf -> m Int
 readImpl t o = usingFromFrozen $ Buffer.read t o
 
-readStringImpl :: forall buf m. Encoding -> Offset -> Offset -> buf -> m String
+readStringImpl :: forall buf m. Monad m => Encoding -> Offset -> Offset -> buf -> m String
 readStringImpl m o o' = usingFromFrozen $ Buffer.readString m o o'
 
-toStringImpl :: forall buf m. Encoding -> buf -> m String
+toStringImpl :: forall buf m. Monad m => Encoding -> buf -> m String
 toStringImpl m = usingFromFrozen $ Buffer.toString m
 
-writeImpl :: forall buf m. BufferValueType -> Int -> Offset -> buf -> m Unit
+writeImpl :: forall buf m. Monad m => BufferValueType -> Int -> Offset -> buf -> m Unit
 writeImpl = writeInternal <<< show
 
 foreign import writeInternal :: forall buf m. String -> Int -> Offset -> buf -> m Unit
 
-writeStringImpl :: forall buf m. Encoding -> Offset -> Int -> String -> buf -> m Int
+writeStringImpl :: forall buf m. Monad m => Encoding -> Offset -> Int -> String -> buf -> m Int
 writeStringImpl = writeStringInternal <<< encodingToNode
 
 foreign import writeStringInternal ::
   forall buf m. String -> Offset -> Int -> String -> buf -> m Int
 
-toArrayImpl :: forall buf m. buf -> m (Array Octet)
+toArrayImpl :: forall buf m. Monad m => buf -> m (Array Octet)
 toArrayImpl = usingFromFrozen Buffer.toArray
 
-getAtOffsetImpl :: forall buf m. Offset -> buf -> m (Maybe Octet)
+getAtOffsetImpl :: forall buf m. Monad m => Offset -> buf -> m (Maybe Octet)
 getAtOffsetImpl o = usingFromFrozen $ Buffer.getAtOffset o
 
 foreign import setAtOffsetImpl :: forall buf m. Octet -> Offset -> buf -> m Unit
@@ -224,13 +244,13 @@ foreign import setAtOffsetImpl :: forall buf m. Octet -> Offset -> buf -> m Unit
 sliceImpl :: forall buf. Offset -> Offset -> buf -> buf
 sliceImpl = unsafeCoerce Buffer.slice
 
-sizeImpl :: forall buf m. buf -> m Int
+sizeImpl :: forall buf m. Monad m => buf -> m Int
 sizeImpl = usingFromFrozen Buffer.size
 
 concatImpl :: forall buf m. Array buf -> m buf
 concatImpl arrs = unsafeCoerce \_ -> Buffer.concat (unsafeCoerce arrs)
 
-concatImpl' :: forall buf m. Array buf -> Int -> m buf
+concatImpl' :: forall buf m. Monad m => Array buf -> Int -> m buf
 concatImpl' arrs n = unsafeCoerce \_ -> Buffer.concat' (unsafeCoerce arrs) n
 
 foreign import copyImpl :: forall buf m. Offset -> Offset -> buf -> Offset -> buf -> m Int
