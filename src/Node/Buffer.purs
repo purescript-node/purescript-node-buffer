@@ -1,151 +1,262 @@
 -- | Immutable buffers and associated operations.
 module Node.Buffer
-  ( Octet
-  , Offset
-  , BufferValueType(..)
-  , Buffer
+  ( class MutableBuffer
   , create
+  , freeze
+  , unsafeFreeze
+  , thaw
+  , unsafeThaw
   , fromArray
   , fromString
   , fromArrayBuffer
+  , toArrayBuffer
   , read
   , readString
   , toString
+  , write
+  , writeString
   , toArray
-  , toArrayBuffer
   , getAtOffset
-  , concat
-  , concat'
+  , setAtOffset
   , slice
   , size
+  , concat
+  , concat'
+  , copy
+  , fill
+  , Buffer
+  , STBuffer
+  , runST
+  , module TypesExports
   ) where
 
 import Prelude
 
+import Control.Monad.ST (ST, kind Region)
+import Control.Monad.ST as ST
 import Data.ArrayBuffer.Types (ArrayBuffer)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe)
+import Effect (Effect)
+import Node.Buffer.Immutable (ImmutableBuffer)
+import Node.Buffer.Immutable as Immutable
+import Node.Buffer.Types (BufferValueType, Octet, Offset)
+import Node.Buffer.Types (BufferValueType(..), Octet, Offset) as TypesExports
 import Node.Encoding (Encoding, encodingToNode)
+import Unsafe.Coerce (unsafeCoerce)
 
--- | Type synonym indicating the value should be an octet (0-255). If the value
--- | provided is outside this range it will be used as modulo 256.
-type Octet = Int
+-- | A type class for mutable buffers `buf` where operations on those buffers are
+-- | represented by a particular monadic effect type `m`.
+class Monad m <= MutableBuffer buf m | m -> buf, buf -> m where
 
--- | Type synonym indicating the value refers to an offset in a buffer.
-type Offset = Int
+  -- | Creates a new buffer of the specified size.
+  create :: Int -> m buf
 
--- | Enumeration of the numeric types that can be written to a buffer.
-data BufferValueType
-  = UInt8
-  | UInt16LE
-  | UInt16BE
-  | UInt32LE
-  | UInt32BE
-  | Int8
-  | Int16LE
-  | Int16BE
-  | Int32LE
-  | Int32BE
-  | FloatLE
-  | FloatBE
-  | DoubleLE
-  | DoubleBE
+  -- | Creates an immutable copy of a mutable buffer.
+  freeze :: buf -> m ImmutableBuffer
 
-instance showBufferValueType :: Show BufferValueType where
-  show UInt8    = "UInt8"
-  show UInt16LE = "UInt16LE"
-  show UInt16BE = "UInt16BE"
-  show UInt32LE = "UInt32LE"
-  show UInt32BE = "UInt32BE"
-  show Int8     = "Int8"
-  show Int16LE  = "Int16LE"
-  show Int16BE  = "Int16BE"
-  show Int32LE  = "Int32LE"
-  show Int32BE  = "Int32BE"
-  show FloatLE  = "FloatLE"
-  show FloatBE  = "FloatBE"
-  show DoubleLE = "DoubleLE"
-  show DoubleBE = "DoubleBE"
+  -- | O(1). Convert a mutable buffer to an immutable buffer, without copying. The
+  -- | mutable buffer must not be mutated afterwards.
+  unsafeFreeze :: buf -> m ImmutableBuffer
 
--- | An immutable buffer that exists independently of any memory region or effect.
+  -- | Creates a mutable copy of an immutable buffer.
+  thaw :: ImmutableBuffer -> m buf
+
+  -- | O(1) Convert an immutable buffer to a mutable buffer, without copying. The
+  -- | input buffer must not be used afterward.
+  unsafeThaw :: ImmutableBuffer -> m buf
+
+  -- | Creates a new buffer from an array of octets, sized to match the array.
+  fromArray :: Array Octet -> m buf
+
+  -- | Creates a new buffer from a string with the specified encoding, sized to
+  -- | match the string.
+  fromString :: String -> Encoding -> m buf
+
+  -- | Creates a buffer view from a JS ArrayByffer without copying data.
+  fromArrayBuffer :: ArrayBuffer -> m buf
+
+  -- | Copies the data in the buffer to a new JS ArrayBuffer
+  toArrayBuffer :: buf -> m ArrayBuffer
+
+  -- | Reads a numeric value from a buffer at the specified offset.
+  read :: BufferValueType -> Offset -> buf -> m Int
+
+  -- | Reads a section of a buffer as a string with the specified encoding.
+  readString :: Encoding -> Offset -> Offset -> buf -> m String
+
+  -- | Reads the buffer as a string with the specified encoding.
+  toString :: Encoding -> buf -> m String
+
+  -- | Writes a numeric value to a buffer at the specified offset.
+  write :: BufferValueType -> Int -> Offset -> buf -> m Unit
+
+  -- | Writes octets from a string to a buffer at the specified offset. Multi-byte
+  -- | characters will not be written to the buffer if there is not enough capacity
+  -- | to write them fully. The number of bytes written is returned.
+  writeString :: Encoding -> Offset -> Int -> String -> buf -> m Int
+
+  -- | Creates an array of octets from a buffer's contents.
+  toArray :: buf -> m (Array Octet)
+
+  -- | Reads an octet from a buffer at the specified offset.
+  getAtOffset :: Offset -> buf -> m (Maybe Octet)
+
+  -- | Writes an octet in the buffer at the specified offset.
+  setAtOffset :: Octet -> Offset -> buf -> m Unit
+
+  -- | Creates a new buffer slice that acts like a window on the original buffer.
+  -- | Writing to the slice buffer updates the original buffer and vice-versa.
+  slice :: Offset -> Offset -> buf -> buf
+
+  -- | Returns the size of a buffer.
+  size :: buf -> m Int
+
+  -- | Concatenates a list of buffers.
+  concat :: Array buf -> m buf
+
+  -- | Concatenates a list of buffers, combining them into a new buffer of the
+  -- | specified length.
+  concat' :: Array buf -> Int -> m buf
+
+  -- | Copies a section of a source buffer into a target buffer at the specified
+  -- | offset, and returns the number of octets copied.
+  copy :: Offset -> Offset -> buf -> Offset -> buf -> m Int
+
+  -- | Fills a range in a buffer with the specified octet.
+  fill :: Octet -> Offset -> Offset -> buf -> m Unit
+
+-- | A reference to a mutable buffer for use with `Effect`
 foreign import data Buffer :: Type
 
-instance showBuffer :: Show Buffer where
-  show = showImpl
+-- | A reference to a mutable buffer for use with `ST`
+-- |
+-- | The type parameter represents the memory region which the buffer belongs to.
+foreign import data STBuffer :: Region -> Type
 
-foreign import showImpl :: Buffer -> String
+-- | Runs an effect creating an `STBuffer` then freezes the buffer and returns
+-- | it, without unneccessary copying.
+runST :: (forall h. ST h (STBuffer h)) -> ImmutableBuffer
+runST st = ST.run (st >>= unsafeFreeze)
 
-instance eqBuffer :: Eq Buffer where
-  eq = eqImpl
+instance mutableBufferEffect :: MutableBuffer Buffer Effect where
+  create = createImpl
+  freeze = copyAllImpl
+  unsafeFreeze = unsafeFreezeImpl
+  thaw = copyAllImpl
+  unsafeThaw = unsafeThawImpl
+  fromArray = fromArrayImpl
+  fromString = fromStringImpl
+  fromArrayBuffer = fromArrayBufferImpl
+  toArrayBuffer = toArrayBufferImpl
+  read = readImpl
+  readString = readStringImpl
+  toString = toStringImpl
+  write = writeImpl
+  writeString = writeStringImpl
+  toArray = toArrayImpl
+  getAtOffset = getAtOffsetImpl
+  setAtOffset = setAtOffsetImpl
+  slice = sliceImpl
+  size = sizeImpl
+  concat = concatImpl
+  concat' = concatImpl'
+  copy = copyImpl
+  fill = fillImpl
 
-foreign import eqImpl :: Buffer -> Buffer -> Boolean
+instance mutableBufferST :: MutableBuffer (STBuffer h) (ST h) where
+  create = createImpl
+  freeze = copyAllImpl
+  unsafeFreeze = unsafeFreezeImpl
+  thaw = copyAllImpl
+  unsafeThaw = unsafeThawImpl
+  fromArray = fromArrayImpl
+  fromString = fromStringImpl
+  fromArrayBuffer = fromArrayBufferImpl
+  toArrayBuffer = toArrayBufferImpl
+  read = readImpl
+  readString = readStringImpl
+  toString = toStringImpl
+  write = writeImpl
+  writeString = writeStringImpl
+  toArray = toArrayImpl
+  getAtOffset = getAtOffsetImpl
+  setAtOffset = setAtOffsetImpl
+  slice = sliceImpl
+  size = sizeImpl
+  concat = concatImpl
+  concat' = concatImpl'
+  copy = copyImpl
+  fill = fillImpl
 
-instance ordBuffer :: Ord Buffer where
-  compare a b =
-    case compareImpl a b of
-      x | x < 0 -> LT
-      x | x > 0 -> GT
-      otherwise -> EQ
+unsafeFreezeImpl :: forall buf m. Monad m => buf -> m ImmutableBuffer
+unsafeFreezeImpl = pure <<< unsafeCoerce
 
-foreign import compareImpl :: Buffer -> Buffer -> Int
+unsafeThawImpl :: forall buf m. Monad m => ImmutableBuffer -> m buf
+unsafeThawImpl = pure <<< unsafeCoerce
 
--- | Creates a new buffer of the specified size.
-foreign import create :: Int -> Buffer
+usingFromFrozen :: forall buf m a. Monad m => (ImmutableBuffer -> a) -> buf -> m a
+usingFromFrozen f buf = f <$> unsafeFreezeImpl buf
 
--- | Creates a new buffer from an array of octets, sized to match the array.
-foreign import fromArray :: Array Octet -> Buffer
+usingToFrozen :: forall buf m a. Monad m => (a -> ImmutableBuffer) -> a -> m buf
+usingToFrozen f x = unsafeThawImpl $ f x
 
--- | Creates a buffer view from a JS ArrayByffer without copying data.
---
--- Requires Node >= v5.10.0
-foreign import fromArrayBuffer :: ArrayBuffer -> Buffer
+createImpl :: forall buf m. Monad m => Int -> m buf
+createImpl = usingToFrozen Immutable.create
 
--- | Creates a new buffer from a string with the specified encoding, sized to match the string.
-fromString :: String -> Encoding -> Buffer
-fromString str = fromStringImpl str <<< encodingToNode
+foreign import copyAllImpl :: forall a buf m. a -> m buf
 
-foreign import fromStringImpl :: String -> String -> Buffer
+fromArrayImpl :: forall buf m. Monad m => Array Octet -> m buf
+fromArrayImpl = usingToFrozen Immutable.fromArray
 
--- | Reads a numeric value from a buffer at the specified offset.
-read :: BufferValueType -> Offset -> Buffer -> Int
-read = readImpl <<< show
+fromStringImpl :: forall buf m. Monad m => String -> Encoding -> m buf
+fromStringImpl s = usingToFrozen $ Immutable.fromString s
 
-foreign import readImpl :: String -> Offset -> Buffer -> Int
+fromArrayBufferImpl :: forall buf m. Monad m => ArrayBuffer -> m buf
+fromArrayBufferImpl = usingToFrozen Immutable.fromArrayBuffer
 
--- | Reads a section of a buffer as a string with the specified encoding.
-readString :: Encoding -> Offset -> Offset -> Buffer -> String
-readString = readStringImpl <<< encodingToNode
+toArrayBufferImpl :: forall buf m. Monad m => buf -> m ArrayBuffer
+toArrayBufferImpl = usingFromFrozen Immutable.toArrayBuffer
 
-foreign import readStringImpl ::
-  String -> Offset -> Offset -> Buffer -> String
+readImpl :: forall buf m. Monad m => BufferValueType -> Offset -> buf -> m Int
+readImpl t o = usingFromFrozen $ Immutable.read t o
 
--- | Reads the buffer as a string with the specified encoding.
-toString :: Encoding -> Buffer -> String
-toString = toStringImpl <<< encodingToNode
+readStringImpl :: forall buf m. Monad m => Encoding -> Offset -> Offset -> buf -> m String
+readStringImpl m o o' = usingFromFrozen $ Immutable.readString m o o'
 
-foreign import toStringImpl :: String -> Buffer -> String
+toStringImpl :: forall buf m. Monad m => Encoding -> buf -> m String
+toStringImpl m = usingFromFrozen $ Immutable.toString m
 
--- | Creates an array of octets from a buffer's contents.
-foreign import toArray :: Buffer -> Array Octet
+writeImpl :: forall buf m. Monad m => BufferValueType -> Int -> Offset -> buf -> m Unit
+writeImpl = writeInternal <<< show
 
--- | Creates an `ArrayBuffer` by copying a buffer's contents.
-foreign import toArrayBuffer :: Buffer -> ArrayBuffer
+foreign import writeInternal :: forall buf m. String -> Int -> Offset -> buf -> m Unit
 
--- | Reads an octet from a buffer at the specified offset.
-getAtOffset :: Offset -> Buffer -> Maybe Octet
-getAtOffset = getAtOffsetImpl Just Nothing
+writeStringImpl :: forall buf m. Monad m => Encoding -> Offset -> Int -> String -> buf -> m Int
+writeStringImpl = writeStringInternal <<< encodingToNode
 
-foreign import getAtOffsetImpl ::
-  (Octet -> Maybe Octet) -> Maybe Octet -> Offset -> Buffer -> Maybe Octet
+foreign import writeStringInternal ::
+  forall buf m. String -> Offset -> Int -> String -> buf -> m Int
 
--- | Concatenates a list of buffers.
-foreign import concat :: Array Buffer -> Buffer
+toArrayImpl :: forall buf m. Monad m => buf -> m (Array Octet)
+toArrayImpl = usingFromFrozen Immutable.toArray
 
--- | Concatenates a list of buffers, combining them into a new buffer of the
--- | specified length.
-foreign import concat' :: Array Buffer -> Int -> Buffer
+getAtOffsetImpl :: forall buf m. Monad m => Offset -> buf -> m (Maybe Octet)
+getAtOffsetImpl o = usingFromFrozen $ Immutable.getAtOffset o
 
--- | Creates a new buffer slice that shares the memory of the original buffer.
-foreign import slice :: Offset -> Offset -> Buffer -> Buffer
+foreign import setAtOffsetImpl :: forall buf m. Octet -> Offset -> buf -> m Unit
 
--- | Returns the size of a buffer.
-foreign import size :: Buffer -> Int
+sliceImpl :: forall buf. Offset -> Offset -> buf -> buf
+sliceImpl = unsafeCoerce Immutable.slice
+
+sizeImpl :: forall buf m. Monad m => buf -> m Int
+sizeImpl = usingFromFrozen Immutable.size
+
+concatImpl :: forall buf m. Array buf -> m buf
+concatImpl arrs = unsafeCoerce \_ -> Immutable.concat (unsafeCoerce arrs)
+
+concatImpl' :: forall buf m. Monad m => Array buf -> Int -> m buf
+concatImpl' arrs n = unsafeCoerce \_ -> Immutable.concat' (unsafeCoerce arrs) n
+
+foreign import copyImpl :: forall buf m. Offset -> Offset -> buf -> Offset -> buf -> m Int
+
+foreign import fillImpl :: forall buf m. Octet -> Offset -> Offset -> buf -> m Unit
