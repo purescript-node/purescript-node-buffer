@@ -194,37 +194,37 @@ unsafeFreezeImpl = pure <<< unsafeCoerce
 unsafeThawImpl :: forall buf m. Monad m => ImmutableBuffer -> m buf
 unsafeThawImpl = pure <<< unsafeCoerce
 
-usingFromFrozen :: forall buf m a. Monad m => (ImmutableBuffer -> a) -> buf -> m a
-usingFromFrozen f buf = f <$> unsafeFreezeImpl buf
+usingFromImmutable :: forall buf m a. Monad m => (ImmutableBuffer -> a) -> buf -> m a
+usingFromImmutable f buf = f <$> unsafeFreezeImpl buf
 
-usingToFrozen :: forall buf m a. Monad m => (a -> ImmutableBuffer) -> a -> m buf
-usingToFrozen f x = unsafeThawImpl $ f x
+usingToImmutable :: forall buf m a. Monad m => (a -> ImmutableBuffer) -> a -> m buf
+usingToImmutable f x = unsafeThawImpl $ f x
 
 createImpl :: forall buf m. Monad m => Int -> m buf
-createImpl = usingToFrozen Immutable.create
+createImpl = usingToImmutable Immutable.create
 
 foreign import copyAllImpl :: forall a buf m. a -> m buf
 
 fromArrayImpl :: forall buf m. Monad m => Array Octet -> m buf
-fromArrayImpl = usingToFrozen Immutable.fromArray
+fromArrayImpl = usingToImmutable Immutable.fromArray
 
 fromStringImpl :: forall buf m. Monad m => String -> Encoding -> m buf
-fromStringImpl s = usingToFrozen $ Immutable.fromString s
+fromStringImpl s = usingToImmutable $ Immutable.fromString s
 
 fromArrayBufferImpl :: forall buf m. Monad m => ArrayBuffer -> m buf
-fromArrayBufferImpl = usingToFrozen Immutable.fromArrayBuffer
+fromArrayBufferImpl = usingToImmutable Immutable.fromArrayBuffer
 
 toArrayBufferImpl :: forall buf m. Monad m => buf -> m ArrayBuffer
-toArrayBufferImpl = usingFromFrozen Immutable.toArrayBuffer
+toArrayBufferImpl = usingFromImmutable Immutable.toArrayBuffer
 
 readImpl :: forall buf m. Monad m => BufferValueType -> Offset -> buf -> m Int
-readImpl t o = usingFromFrozen $ Immutable.read t o
+readImpl t o = usingFromImmutable $ Immutable.read t o
 
 readStringImpl :: forall buf m. Monad m => Encoding -> Offset -> Offset -> buf -> m String
-readStringImpl m o o' = usingFromFrozen $ Immutable.readString m o o'
+readStringImpl m o o' = usingFromImmutable $ Immutable.readString m o o'
 
 toStringImpl :: forall buf m. Monad m => Encoding -> buf -> m String
-toStringImpl m = usingFromFrozen $ Immutable.toString m
+toStringImpl m = usingFromImmutable $ Immutable.toString m
 
 writeImpl :: forall buf m. Monad m => BufferValueType -> Int -> Offset -> buf -> m Unit
 writeImpl = writeInternal <<< show
@@ -238,10 +238,10 @@ foreign import writeStringInternal ::
   forall buf m. String -> Offset -> Int -> String -> buf -> m Int
 
 toArrayImpl :: forall buf m. Monad m => buf -> m (Array Octet)
-toArrayImpl = usingFromFrozen Immutable.toArray
+toArrayImpl = usingFromImmutable Immutable.toArray
 
 getAtOffsetImpl :: forall buf m. Monad m => Offset -> buf -> m (Maybe Octet)
-getAtOffsetImpl o = usingFromFrozen $ Immutable.getAtOffset o
+getAtOffsetImpl o = usingFromImmutable $ Immutable.getAtOffset o
 
 foreign import setAtOffsetImpl :: forall buf m. Octet -> Offset -> buf -> m Unit
 
@@ -249,7 +249,7 @@ sliceImpl :: forall buf. Offset -> Offset -> buf -> buf
 sliceImpl = unsafeCoerce Immutable.slice
 
 sizeImpl :: forall buf m. Monad m => buf -> m Int
-sizeImpl = usingFromFrozen Immutable.size
+sizeImpl = usingFromImmutable Immutable.size
 
 concatImpl :: forall buf m. Array buf -> m buf
 concatImpl arrs = unsafeCoerce \_ -> Immutable.concat (unsafeCoerce arrs)
