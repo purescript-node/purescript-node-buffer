@@ -16,7 +16,7 @@ import Unsafe.Coerce (unsafeCoerce)
 test :: Effect Unit
 test = do
   log "Testing Node.Buffer.ST ..."
-  testMutableBuffer (Proxy :: Proxy (STBuffer _)) (unsafeCoerce ST.run >>> pure)
+  testMutableBuffer (Proxy :: Proxy (STBuffer _)) unsafeCoerce
   log " - run"
   testRun
 
