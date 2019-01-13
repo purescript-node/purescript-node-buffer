@@ -1,20 +1,27 @@
--- | Mutable buffers and associated operations.
-module Node.Buffer
-  ( Buffer
-  , module TypesExports
-  , module Class
+module Node.Buffer.ST
+  ( STBuffer
+  , run
   ) where
 
-import Effect (Effect)
-import Node.Buffer.Class (class MutableBuffer)
-import Node.Buffer.Class (class MutableBuffer, concat, concat', copy, create, fill, freeze, fromArray, fromArrayBuffer, fromString, getAtOffset, read, readString, setAtOffset, size, slice, thaw, toArray, toArrayBuffer, toString, unsafeFreeze, unsafeThaw, write, writeString) as Class
+import Prelude
+
+import Control.Monad.ST (ST, kind Region)
+import Control.Monad.ST as ST
+import Node.Buffer.Class (class MutableBuffer, unsafeFreeze)
+import Node.Buffer.Immutable (ImmutableBuffer)
 import Node.Buffer.Internal as Internal
-import Node.Buffer.Types (BufferValueType(..), Octet, Offset) as TypesExports
 
--- | A reference to a mutable buffer for use with `Effect`
-foreign import data Buffer :: Type
+-- | A reference to a mutable buffer for use with `ST`
+-- |
+-- | The type parameter represents the memory region which the buffer belongs to.
+foreign import data STBuffer :: Region -> Type
 
-instance mutableBufferEffect :: MutableBuffer Buffer Effect where
+-- | Runs an effect creating an `STBuffer` then freezes the buffer and returns
+-- | it, without unneccessary copying.
+run :: (forall h. ST h (STBuffer h)) -> ImmutableBuffer
+run st = ST.run (st >>= unsafeFreeze)
+
+instance mutableBufferST :: MutableBuffer (STBuffer h) (ST h) where
   create = Internal.create
   freeze = Internal.copyAll
   unsafeFreeze = Internal.unsafeFreeze

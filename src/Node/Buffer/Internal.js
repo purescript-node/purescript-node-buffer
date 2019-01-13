@@ -2,7 +2,7 @@
 /* global Buffer */
 "use strict";
 
-exports.copyAllImpl = function(a) {
+exports.copyAll = function(a) {
   return function() {
     return Buffer.from(a);
   };
@@ -35,7 +35,7 @@ exports.writeStringInternal = function (encoding) {
   };
 };
 
-exports.setAtOffsetImpl = function (value) {
+exports.setAtOffset = function (value) {
   return function (offset) {
     return function (buff) {
       return function() {
@@ -46,7 +46,7 @@ exports.setAtOffsetImpl = function (value) {
   };
 };
 
-exports.copyImpl = function (srcStart) {
+exports.copy = function (srcStart) {
   return function (srcEnd) {
     return function (src) {
       return function (targStart) {
@@ -60,7 +60,7 @@ exports.copyImpl = function (srcStart) {
   };
 };
 
-exports.fillImpl = function (octet) {
+exports.fill = function (octet) {
   return function (start) {
     return function (end) {
       return function (buf) {
