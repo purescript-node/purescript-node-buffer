@@ -1,4 +1,4 @@
--- | Immutable buffers and associated operations.
+-- | Mutable buffers and associated operations.
 module Node.Buffer
   ( class MutableBuffer
   , create
