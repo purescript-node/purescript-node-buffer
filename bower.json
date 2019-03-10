@@ -15,11 +15,14 @@
   "dependencies": {
     "purescript-effect": "^2.0.0",
     "purescript-maybe": "^4.0.0",
-    "purescript-arraybuffer-types": "^2.0.0"
+    "purescript-arraybuffer-types": "^2.0.0",
+    "purescript-st": "^4.0.0",
+    "purescript-unsafe-coerce": "^4.0.0"
   },
   "devDependencies": {
     "purescript-assert": "^4.0.0",
     "purescript-console": "^4.1.0",
-    "purescript-foldable-traversable": "^4.0.0"
+    "purescript-foldable-traversable": "^4.0.0",
+    "purescript-proxy": "^3.0.0"
   }
 }
