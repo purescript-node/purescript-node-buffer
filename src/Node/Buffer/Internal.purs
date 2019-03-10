@@ -64,7 +64,7 @@ fromArrayBuffer = usingToImmutable Immutable.fromArrayBuffer
 toArrayBuffer :: forall buf m. Monad m => buf -> m ArrayBuffer
 toArrayBuffer = usingFromImmutable Immutable.toArrayBuffer
 
-read :: forall buf m. Monad m => BufferValueType -> Offset -> buf -> m Int
+read :: forall buf m. Monad m => BufferValueType -> Offset -> buf -> m Number
 read t o = usingFromImmutable $ Immutable.read t o
 
 readString :: forall buf m. Monad m => Encoding -> Offset -> Offset -> buf -> m String
@@ -73,10 +73,10 @@ readString m o o' = usingFromImmutable $ Immutable.readString m o o'
 toString :: forall buf m. Monad m => Encoding -> buf -> m String
 toString m = usingFromImmutable $ Immutable.toString m
 
-write :: forall buf m. Monad m => BufferValueType -> Int -> Offset -> buf -> m Unit
+write :: forall buf m. Monad m => BufferValueType -> Number -> Offset -> buf -> m Unit
 write = writeInternal <<< show
 
-foreign import writeInternal :: forall buf m. String -> Int -> Offset -> buf -> m Unit
+foreign import writeInternal :: forall buf m. String -> Number -> Offset -> buf -> m Unit
 
 writeString :: forall buf m. Monad m => Encoding -> Offset -> Int -> String -> buf -> m Int
 writeString = writeStringInternal <<< encodingToNode

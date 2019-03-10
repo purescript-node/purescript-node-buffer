@@ -64,10 +64,10 @@ fromString str = fromStringImpl str <<< encodingToNode
 foreign import fromStringImpl :: String -> String -> ImmutableBuffer
 
 -- | Reads a numeric value from a buffer at the specified offset.
-read :: BufferValueType -> Offset -> ImmutableBuffer -> Int
+read :: BufferValueType -> Offset -> ImmutableBuffer -> Number
 read = readImpl <<< show
 
-foreign import readImpl :: String -> Offset -> ImmutableBuffer -> Int
+foreign import readImpl :: String -> Offset -> ImmutableBuffer -> Number
 
 -- | Reads a section of a buffer as a string with the specified encoding.
 readString :: Encoding -> Offset -> Offset -> ImmutableBuffer -> String

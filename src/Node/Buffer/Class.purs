@@ -68,7 +68,7 @@ class Monad m <= MutableBuffer buf m | buf -> m where
   toArrayBuffer :: buf -> m ArrayBuffer
 
   -- | Reads a numeric value from a buffer at the specified offset.
-  read :: BufferValueType -> Offset -> buf -> m Int
+  read :: BufferValueType -> Offset -> buf -> m Number
 
   -- | Reads a section of a buffer as a string with the specified encoding.
   readString :: Encoding -> Offset -> Offset -> buf -> m String
@@ -77,7 +77,7 @@ class Monad m <= MutableBuffer buf m | buf -> m where
   toString :: Encoding -> buf -> m String
 
   -- | Writes a numeric value to a buffer at the specified offset.
-  write :: BufferValueType -> Int -> Offset -> buf -> m Unit
+  write :: BufferValueType -> Number -> Offset -> buf -> m Unit
 
   -- | Writes octets from a string to a buffer at the specified offset. Multi-byte
   -- | characters will not be written to the buffer if there is not enough capacity

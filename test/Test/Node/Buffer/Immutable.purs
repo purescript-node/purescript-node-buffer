@@ -82,7 +82,7 @@ testCreate = do
 testFromString :: Effect Unit
 testFromString = do
   let buf = Immutable.fromString "hello, world" ASCII
-  assertEqual {expected: 32, actual: Immutable.read UInt8 6 buf}
+  assertEqual {expected: 32.0, actual: Immutable.read UInt8 6 buf}
 
 testToString :: Effect Unit
 testToString = do
