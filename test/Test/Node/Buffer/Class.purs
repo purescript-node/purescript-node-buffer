@@ -80,7 +80,7 @@ testMutableBuffer _ run = do
 
     testReadWrite :: Effect Unit
     testReadWrite = do
-      let val = 42
+      let val = 42.0
       readVal <- run do
         buf <- create 1 :: m buf
         write UInt8 val 0 buf
@@ -94,7 +94,7 @@ testMutableBuffer _ run = do
         buf <- fromArray [1,2,3,4,5] :: m buf
         read UInt8 2 buf
 
-      assertEqual {expected: 3, actual: readVal}
+      assertEqual {expected: 3.0, actual: readVal}
 
     testToArray :: Effect Unit
     testToArray = do
@@ -112,7 +112,7 @@ testMutableBuffer _ run = do
         buf <- fromString str ASCII :: m buf
         read UInt8 6 buf
 
-      assertEqual {expected: 32, actual: val} -- ASCII space
+      assertEqual {expected: 32.0, actual: val} -- ASCII space
 
     testToFromArrayBuffer :: Effect Unit
     testToFromArrayBuffer = do
