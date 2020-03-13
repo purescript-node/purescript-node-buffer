@@ -100,7 +100,10 @@ foreign import concat :: Array ImmutableBuffer -> ImmutableBuffer
 
 -- | Concatenates a list of buffers, combining them into a new buffer of the
 -- | specified length.
-foreign import concat' :: Array ImmutableBuffer -> Int -> ImmutableBuffer
+concat' :: Array ImmutableBuffer -> Int -> ImmutableBuffer
+concat' = concatToLength
+
+foreign import concatToLength :: Array ImmutableBuffer -> Int -> ImmutableBuffer
 
 -- | Creates a new buffer slice that shares the memory of the original buffer.
 foreign import slice :: Offset -> Offset -> ImmutableBuffer -> ImmutableBuffer

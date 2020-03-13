@@ -96,7 +96,7 @@ exports.concat = function (buffs) {
   return Buffer.concat(buffs);
 };
 
-exports["concat'"] = function (buffs) {
+exports.concatToLength = function (buffs) {
   return function (totalLength) {
     return Buffer.concat(buffs, totalLength);
   };
