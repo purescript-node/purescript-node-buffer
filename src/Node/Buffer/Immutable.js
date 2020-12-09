@@ -1,21 +1,19 @@
-/* global exports */
 /* global Buffer */
-/* global require */
 "use strict";
 
-exports.showImpl = require('util').inspect;
+exports.showImpl = require("util").inspect;
 
-exports.eqImpl = function(a) {
-  return function(b) {
+exports.eqImpl = function (a) {
+  return function (b) {
     return a.equals(b);
-  }
+  };
 };
 
-exports.compareImpl = function(a) {
+exports.compareImpl = function (a) {
   return function (b) {
     return a.compare(b);
   };
-}
+};
 
 exports.create = function (size) {
   return Buffer.alloc(size);
@@ -30,15 +28,15 @@ exports.size = function (buff) {
 };
 
 exports.toArray = function (buff) {
-  var json = buff.toJSON()
+  var json = buff.toJSON();
   return json.data || json;
 };
 
-exports.toArrayBuffer = function(buff) {
+exports.toArrayBuffer = function (buff) {
   return buff.buffer.slice(buff.byteOffset, buff.byteOffset + buff.byteLength);
 };
 
-exports.fromArrayBuffer = function(ab) {
+exports.fromArrayBuffer = function (ab) {
   return Buffer.from(ab);
 };
 
@@ -51,7 +49,7 @@ exports.fromStringImpl = function (str) {
 exports.readImpl = function (ty) {
   return function (offset) {
     return function (buf) {
-      return buf['read' + ty](offset);
+      return buf["read" + ty](offset);
     };
   };
 };
@@ -71,8 +69,7 @@ exports.getAtOffsetImpl = function (just) {
     return function (offset) {
       return function (buff) {
         var octet = buff[offset];
-        return octet == null ? nothing
-                             : just(octet);
+        return octet == null ? nothing : just(octet);
       };
     };
   };

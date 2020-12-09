@@ -1,4 +1,3 @@
-/* global exports */
 /* global Buffer */
 "use strict";
 
