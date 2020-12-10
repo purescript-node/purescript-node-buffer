@@ -22,7 +22,6 @@
   "devDependencies": {
     "purescript-assert": "master",
     "purescript-console": "master",
-    "purescript-foldable-traversable": "master",
-    "purescript-proxy": "master"
+    "purescript-foldable-traversable": "master"
   }
 }
