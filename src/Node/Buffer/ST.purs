@@ -5,7 +5,7 @@ module Node.Buffer.ST
 
 import Prelude
 
-import Control.Monad.ST (ST, kind Region)
+import Control.Monad.ST (ST, Region)
 import Control.Monad.ST as ST
 import Node.Buffer.Class (class MutableBuffer, unsafeFreeze)
 import Node.Buffer.Immutable (ImmutableBuffer)
