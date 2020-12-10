@@ -13,7 +13,6 @@ exports.writeInternal = function (ty) {
       return function (buf) {
         return function () {
           buf["write" + ty](value, offset);
-          return {};
         };
       };
     };
@@ -39,7 +38,6 @@ exports.setAtOffset = function (value) {
     return function (buff) {
       return function () {
         buff[offset] = value;
-        return {};
       };
     };
   };
@@ -65,7 +63,6 @@ exports.fill = function (octet) {
       return function (buf) {
         return function () {
           buf.fill(octet, start, end);
-          return {};
         };
       };
     };

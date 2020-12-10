@@ -23,7 +23,8 @@ module Node.Buffer.Internal
   , concat
   , concat'
   , copy
-  , fill ) where
+  , fill
+  ) where
 
 import Prelude
 
