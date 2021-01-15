@@ -12,6 +12,17 @@ Bugfixes:
 
 Other improvements:
 
+## [v7.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v7.0.0) - 2021-MONTH-DAY
+
+Breaking changes:
+  - Updated code for PureScript 0.14 and dropped the `proxy` dependency as the `proxy` library has been migrated into `prelude` (#39).
+
+Other improvements:
+  - Removed primes from the `concat'` function in FFI in preparation for ES modules support (#36)
+  - Migrated CI to use GitHub Actions and updated installation instructions to use Spago (#38)
+  - Stopped returning empty objects in foreign implementations for functions which return `Unit` for a small performance benefit (#40)
+  - Added a CHANGELOG.md file and pull request template to the repository (#41)
+
 ## [v6.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v6.0.0) - 2019-07-24
 
 * Add a `MutableBuffer` type class with instances for both `Effect` and `ST`, to allow mutating buffers in either monad, and potentially other monads too (#24, @Dretch)
