@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/purescript-node/purescript-node-buffer"
+    "url": "https://github.com/purescript-node/purescript-node-buffer.git"
   },
   "dependencies": {
     "purescript-effect": "master",
