@@ -12,7 +12,7 @@ Bugfixes:
 
 Other improvements:
 
-## [v7.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v7.0.0) - 2021-MONTH-DAY
+## [v7.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v7.0.0) - 2021-02-26
 
 Breaking changes:
   - Updated code for PureScript 0.14 and dropped the `proxy` dependency as the `proxy` library has been migrated into `prelude` (#39).

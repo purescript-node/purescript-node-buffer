@@ -10,18 +10,18 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/purescript-node/purescript-node-buffer"
+    "url": "https://github.com/purescript-node/purescript-node-buffer.git"
   },
   "dependencies": {
-    "purescript-effect": "master",
-    "purescript-maybe": "master",
-    "purescript-arraybuffer-types": "main",
-    "purescript-st": "master",
-    "purescript-unsafe-coerce": "master"
+    "purescript-arraybuffer-types": "^3.0.0",
+    "purescript-effect": "^3.0.0",
+    "purescript-maybe": "^5.0.0",
+    "purescript-st": "^5.0.0",
+    "purescript-unsafe-coerce": "^5.0.0"
   },
   "devDependencies": {
-    "purescript-assert": "master",
-    "purescript-console": "master",
-    "purescript-foldable-traversable": "master"
+    "purescript-assert": "^5.0.0",
+    "purescript-console": "^5.0.0",
+    "purescript-foldable-traversable": "^5.0.0"
   }
 }
