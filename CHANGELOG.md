@@ -11,6 +11,7 @@ New features:
 Bugfixes:
 
 Other improvements:
+- Fix warnings revealed by v0.14.1 PS release (#44 by @JordanMartinez)
 
 ## [v7.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v7.0.0) - 2021-02-26
 
