@@ -42,7 +42,7 @@ instance ordBuffer :: Ord ImmutableBuffer where
     case compareImpl a b of
       x | x < 0 -> LT
       x | x > 0 -> GT
-      otherwise -> EQ
+      _ -> EQ
 
 foreign import compareImpl :: ImmutableBuffer -> ImmutableBuffer -> Int
 
