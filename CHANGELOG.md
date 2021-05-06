@@ -11,18 +11,22 @@ New features:
 Bugfixes:
 
 Other improvements:
+
+## [v7.0.1](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v7.0.1) - 2021-05-06
+
+Other improvements:
 - Fix warnings revealed by v0.14.1 PS release (#44 by @JordanMartinez)
 
 ## [v7.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v7.0.0) - 2021-02-26
 
 Breaking changes:
-  - Updated code for PureScript 0.14 and dropped the `proxy` dependency as the `proxy` library has been migrated into `prelude` (#39).
+- Updated code for PureScript 0.14 and dropped the `proxy` dependency as the `proxy` library has been migrated into `prelude` (#39).
 
 Other improvements:
-  - Removed primes from the `concat'` function in FFI in preparation for ES modules support (#36)
-  - Migrated CI to use GitHub Actions and updated installation instructions to use Spago (#38)
-  - Stopped returning empty objects in foreign implementations for functions which return `Unit` for a small performance benefit (#40)
-  - Added a CHANGELOG.md file and pull request template to the repository (#41)
+- Removed primes from the `concat'` function in FFI in preparation for ES modules support (#36)
+- Migrated CI to use GitHub Actions and updated installation instructions to use Spago (#38)
+- Stopped returning empty objects in foreign implementations for functions which return `Unit` for a small performance benefit (#40)
+- Added a CHANGELOG.md file and pull request template to the repository (#41)
 
 ## [v6.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v6.0.0) - 2019-07-24
 
@@ -32,11 +36,11 @@ Other improvements:
 
 ## [v5.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v5.0.0) - 2018-05-26
 
-Updated for PureScript 0.12
+- Updated for PureScript 0.12
 
 ## [v4.1.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v4.1.0) - 2017-12-11
 
-Add `fromArrayBuffer` (@matthewleon)
+- Added `fromArrayBuffer` (@matthewleon)
 
 ## [v4.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v4.0.0) - 2017-11-19
 
@@ -44,11 +48,11 @@ Add `fromArrayBuffer` (@matthewleon)
 
 ## [v3.0.1](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v3.0.1) - 2017-06-20
 
-Fix an encoding issue in `writeString` (@justinwoo)
+- Fixed an encoding issue in `writeString` (@justinwoo)
 
 ## [v3.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v3.0.0) - 2017-04-04
 
-Updates for 0.11 (@anilanar)
+- Updated for 0.11 (@anilanar)
 
 ## [v2.0.1](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v2.0.1) - 2017-02-10
 
@@ -67,11 +71,11 @@ Updates for 0.11 (@anilanar)
 
 ## [v0.2.2](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v0.2.2) - 2016-04-03
 
-Fix `byteLength`, which had a bad FFI declaration, so that it would throw an error every time it was called.
+- Fixed `byteLength`, which had a bad FFI declaration, so that it would throw an error every time it was called.
 
 ## [v0.2.1](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v0.2.1) - 2016-04-03
 
-No code changes, this tag was just for publishing to Pursuit.
+- No code changes, this tag was just for publishing to Pursuit.
 
 ## [v0.2.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v0.2.0) - 2015-11-11
 
@@ -79,9 +83,7 @@ No code changes, this tag was just for publishing to Pursuit.
 
 ## [v0.1.1](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v0.1.1) - 2015-11-10
 
-Release v0.1.1
-Fix `write`, `writeString`, and `fill`, which used to immediately throw errors at
-runtime upon use.
+- Fixed `write`, `writeString`, and `fill`, which used to immediately throw errors at runtime upon use.
 
 ## [v0.1.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v0.1.0) - 2015-07-06
 
@@ -90,5 +92,4 @@ runtime upon use.
 
 ## [v0.0.1](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v0.0.1) - 2014-10-14
 
-Initial versioned release
-
+- Initial versioned release
