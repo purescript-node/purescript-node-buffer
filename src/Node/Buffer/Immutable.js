@@ -5,13 +5,13 @@ import { inspect } from "util";
 export const showImpl = inspect;
 
 export function eqImpl(a) {
-  return function (b) {
+  return b => {
     return a.equals(b);
   };
 }
 
 export function compareImpl(a) {
-  return function (b) {
+  return b => {
     return a.compare(b);
   };
 }
@@ -42,23 +42,23 @@ export function fromArrayBuffer(ab) {
 }
 
 export function fromStringImpl(str) {
-  return function (encoding) {
+  return encoding => {
     return Buffer.from(str, encoding);
   };
 }
 
 export function readImpl(ty) {
-  return function (offset) {
-    return function (buf) {
+  return offset => {
+    return buf => {
       return buf["read" + ty](offset);
     };
   };
 }
 
 export function readStringImpl(enc) {
-  return function (start) {
-    return function (end) {
-      return function (buff) {
+  return start => {
+    return end => {
+      return buff => {
         return buff.toString(enc, start, end);
       };
     };
@@ -66,9 +66,9 @@ export function readStringImpl(enc) {
 }
 
 export function getAtOffsetImpl(just) {
-  return function (nothing) {
-    return function (offset) {
-      return function (buff) {
+  return nothing => {
+    return offset => {
+      return buff => {
         var octet = buff[offset];
         return octet == null ? nothing : just(octet);
       };
@@ -77,14 +77,14 @@ export function getAtOffsetImpl(just) {
 }
 
 export function toStringImpl(enc) {
-  return function (buff) {
+  return buff => {
     return buff.toString(enc);
   };
 }
 
 export function slice(start) {
-  return function (end) {
-    return function (buff) {
+  return end => {
+    return buff => {
       return buff.slice(start, end);
     };
   };
@@ -95,7 +95,7 @@ export function concat(buffs) {
 }
 
 export function concatToLength(buffs) {
-  return function (totalLength) {
+  return totalLength => {
     return Buffer.concat(buffs, totalLength);
   };
 }

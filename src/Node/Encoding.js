@@ -2,7 +2,7 @@
 "use strict";
 
 export function byteLengthImpl(str) {
-  return function (enc) {
+  return enc => {
     return Buffer.byteLength(str, enc);
   };
 }

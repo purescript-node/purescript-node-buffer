@@ -2,16 +2,16 @@
 "use strict";
 
 export function copyAll(a) {
-  return function () {
+  return () => {
     return Buffer.from(a);
   };
 }
 
 export function writeInternal(ty) {
-  return function (value) {
-    return function (offset) {
-      return function (buf) {
-        return function () {
+  return value => {
+    return offset => {
+      return buf => {
+        return () => {
           buf["write" + ty](value, offset);
         };
       };
@@ -20,11 +20,11 @@ export function writeInternal(ty) {
 }
 
 export function writeStringInternal(encoding) {
-  return function (offset) {
-    return function (length) {
-      return function (value) {
-        return function (buff) {
-          return function () {
+  return offset => {
+    return length => {
+      return value => {
+        return buff => {
+          return () => {
             return buff.write(value, offset, length, encoding);
           };
         };
@@ -34,9 +34,9 @@ export function writeStringInternal(encoding) {
 }
 
 export function setAtOffset(value) {
-  return function (offset) {
-    return function (buff) {
-      return function () {
+  return offset => {
+    return buff => {
+      return () => {
         buff[offset] = value;
       };
     };
@@ -44,11 +44,11 @@ export function setAtOffset(value) {
 }
 
 export function copy(srcStart) {
-  return function (srcEnd) {
-    return function (src) {
-      return function (targStart) {
-        return function (targ) {
-          return function () {
+  return srcEnd => {
+    return src => {
+      return targStart => {
+        return targ => {
+          return () => {
             return src.copy(targ, targStart, srcStart, srcEnd);
           };
         };
@@ -58,10 +58,10 @@ export function copy(srcStart) {
 }
 
 export function fill(octet) {
-  return function (start) {
-    return function (end) {
-      return function (buf) {
-        return function () {
+  return start => {
+    return end => {
+      return buf => {
+        return () => {
           buf.fill(octet, start, end);
         };
       };
