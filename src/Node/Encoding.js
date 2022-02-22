@@ -1,8 +1,8 @@
 /* global Buffer */
 "use strict";
 
-exports.byteLengthImpl = function (str) {
+export function byteLengthImpl(str) {
   return function (enc) {
     return Buffer.byteLength(str, enc);
   };
-};
+}

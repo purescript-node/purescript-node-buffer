@@ -1,60 +1,60 @@
 /* global Buffer */
 "use strict";
 
-exports.showImpl = require("util").inspect;
+export const showImpl = require("util").inspect;
 
-exports.eqImpl = function (a) {
+export function eqImpl(a) {
   return function (b) {
     return a.equals(b);
   };
-};
+}
 
-exports.compareImpl = function (a) {
+export function compareImpl(a) {
   return function (b) {
     return a.compare(b);
   };
-};
+}
 
-exports.create = function (size) {
+export function create(size) {
   return Buffer.alloc(size);
-};
+}
 
-exports.fromArray = function (octets) {
+export function fromArray(octets) {
   return Buffer.from(octets);
-};
+}
 
-exports.size = function (buff) {
+export function size(buff) {
   return buff.length;
-};
+}
 
-exports.toArray = function (buff) {
+export function toArray(buff) {
   var json = buff.toJSON();
   return json.data || json;
-};
+}
 
-exports.toArrayBuffer = function (buff) {
+export function toArrayBuffer(buff) {
   return buff.buffer.slice(buff.byteOffset, buff.byteOffset + buff.byteLength);
-};
+}
 
-exports.fromArrayBuffer = function (ab) {
+export function fromArrayBuffer(ab) {
   return Buffer.from(ab);
-};
+}
 
-exports.fromStringImpl = function (str) {
+export function fromStringImpl(str) {
   return function (encoding) {
     return Buffer.from(str, encoding);
   };
-};
+}
 
-exports.readImpl = function (ty) {
+export function readImpl(ty) {
   return function (offset) {
     return function (buf) {
       return buf["read" + ty](offset);
     };
   };
-};
+}
 
-exports.readStringImpl = function (enc) {
+export function readStringImpl(enc) {
   return function (start) {
     return function (end) {
       return function (buff) {
@@ -62,9 +62,9 @@ exports.readStringImpl = function (enc) {
       };
     };
   };
-};
+}
 
-exports.getAtOffsetImpl = function (just) {
+export function getAtOffsetImpl(just) {
   return function (nothing) {
     return function (offset) {
       return function (buff) {
@@ -73,28 +73,28 @@ exports.getAtOffsetImpl = function (just) {
       };
     };
   };
-};
+}
 
-exports.toStringImpl = function (enc) {
+export function toStringImpl(enc) {
   return function (buff) {
     return buff.toString(enc);
   };
-};
+}
 
-exports.slice = function (start) {
+export function slice(start) {
   return function (end) {
     return function (buff) {
       return buff.slice(start, end);
     };
   };
-};
+}
 
-exports.concat = function (buffs) {
+export function concat(buffs) {
   return Buffer.concat(buffs);
-};
+}
 
-exports.concatToLength = function (buffs) {
+export function concatToLength(buffs) {
   return function (totalLength) {
     return Buffer.concat(buffs, totalLength);
   };
-};
+}
