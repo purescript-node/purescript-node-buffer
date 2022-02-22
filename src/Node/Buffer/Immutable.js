@@ -1,7 +1,9 @@
 /* global Buffer */
 "use strict";
 
-export const showImpl = require("util").inspect;
+import util from "util";
+
+export const showImpl = util.inspect;
 
 export function eqImpl(a) {
   return function (b) {
