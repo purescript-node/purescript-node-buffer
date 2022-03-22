@@ -1,100 +1,99 @@
 /* global Buffer */
-"use strict";
+import { inspect } from "util";
+export const showImpl = inspect;
 
-exports.showImpl = require("util").inspect;
-
-exports.eqImpl = function (a) {
-  return function (b) {
+export function eqImpl(a) {
+  return b => {
     return a.equals(b);
   };
-};
+}
 
-exports.compareImpl = function (a) {
-  return function (b) {
+export function compareImpl(a) {
+  return b => {
     return a.compare(b);
   };
-};
+}
 
-exports.create = function (size) {
+export function create(size) {
   return Buffer.alloc(size);
-};
+}
 
-exports.fromArray = function (octets) {
+export function fromArray(octets) {
   return Buffer.from(octets);
-};
+}
 
-exports.size = function (buff) {
+export function size(buff) {
   return buff.length;
-};
+}
 
-exports.toArray = function (buff) {
+export function toArray(buff) {
   var json = buff.toJSON();
   return json.data || json;
-};
+}
 
-exports.toArrayBuffer = function (buff) {
+export function toArrayBuffer(buff) {
   return buff.buffer.slice(buff.byteOffset, buff.byteOffset + buff.byteLength);
-};
+}
 
-exports.fromArrayBuffer = function (ab) {
+export function fromArrayBuffer(ab) {
   return Buffer.from(ab);
-};
+}
 
-exports.fromStringImpl = function (str) {
-  return function (encoding) {
+export function fromStringImpl(str) {
+  return encoding => {
     return Buffer.from(str, encoding);
   };
-};
+}
 
-exports.readImpl = function (ty) {
-  return function (offset) {
-    return function (buf) {
+export function readImpl(ty) {
+  return offset => {
+    return buf => {
       return buf["read" + ty](offset);
     };
   };
-};
+}
 
-exports.readStringImpl = function (enc) {
-  return function (start) {
-    return function (end) {
-      return function (buff) {
+export function readStringImpl(enc) {
+  return start => {
+    return end => {
+      return buff => {
         return buff.toString(enc, start, end);
       };
     };
   };
-};
+}
 
-exports.getAtOffsetImpl = function (just) {
-  return function (nothing) {
-    return function (offset) {
-      return function (buff) {
+export function getAtOffsetImpl(just) {
+  return nothing => {
+    return offset => {
+      return buff => {
         var octet = buff[offset];
         return octet == null ? nothing : just(octet);
       };
     };
   };
-};
+}
 
-exports.toStringImpl = function (enc) {
-  return function (buff) {
+export function toStringImpl(enc) {
+  return buff => {
     return buff.toString(enc);
   };
-};
+}
 
-exports.slice = function (start) {
-  return function (end) {
-    return function (buff) {
+export function slice(start) {
+  return end => {
+    return buff => {
       return buff.slice(start, end);
     };
   };
-};
+}
 
-exports.concat = function (buffs) {
+export function concat(buffs) {
   return Buffer.concat(buffs);
-};
+}
 
-exports.concatToLength = function (buffs) {
-  return function (totalLength) {
+export function concatToLength(buffs) {
+  return totalLength => {
     return Buffer.concat(buffs, totalLength);
   };
-};
+}

@@ -1,70 +1,68 @@
 /* global Buffer */
-"use strict";
-
-exports.copyAll = function (a) {
-  return function () {
+export function copyAll(a) {
+  return () => {
     return Buffer.from(a);
   };
-};
+}
 
-exports.writeInternal = function (ty) {
-  return function (value) {
-    return function (offset) {
-      return function (buf) {
-        return function () {
+export function writeInternal(ty) {
+  return value => {
+    return offset => {
+      return buf => {
+        return () => {
           buf["write" + ty](value, offset);
         };
       };
     };
   };
-};
+}
 
-exports.writeStringInternal = function (encoding) {
-  return function (offset) {
-    return function (length) {
-      return function (value) {
-        return function (buff) {
-          return function () {
+export function writeStringInternal(encoding) {
+  return offset => {
+    return length => {
+      return value => {
+        return buff => {
+          return () => {
             return buff.write(value, offset, length, encoding);
           };
         };
       };
     };
   };
-};
+}
 
-exports.setAtOffset = function (value) {
-  return function (offset) {
-    return function (buff) {
-      return function () {
+export function setAtOffset(value) {
+  return offset => {
+    return buff => {
+      return () => {
         buff[offset] = value;
       };
     };
   };
-};
+}
 
-exports.copy = function (srcStart) {
-  return function (srcEnd) {
-    return function (src) {
-      return function (targStart) {
-        return function (targ) {
-          return function () {
+export function copy(srcStart) {
+  return srcEnd => {
+    return src => {
+      return targStart => {
+        return targ => {
+          return () => {
             return src.copy(targ, targStart, srcStart, srcEnd);
           };
         };
       };
     };
   };
-};
+}
 
-exports.fill = function (octet) {
-  return function (start) {
-    return function (end) {
-      return function (buf) {
-        return function () {
+export function fill(octet) {
+  return start => {
+    return end => {
+      return buf => {
+        return () => {
           buf.fill(octet, start, end);
         };
       };
     };
   };
-};
+}
