@@ -1,6 +1,4 @@
 /* global Buffer */
-"use strict";
-
 import { inspect } from "util";
 export const showImpl = inspect;
 

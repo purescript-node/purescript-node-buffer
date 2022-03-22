@@ -1,6 +1,4 @@
 /* global Buffer */
-"use strict";
-
 export function copyAll(a) {
   return () => {
     return Buffer.from(a);
