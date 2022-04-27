@@ -15,7 +15,8 @@ Other improvements:
 ## [v8.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v8.0.0) - 2022-04-27
 
 Breaking changes:
-- Update project and deps to PureScript v0.15.0 (#22 by @nwolverson, @JordanMartinez, @sigma-andex)
+
+- Update project and deps to PureScript v0.15.0 (#46 by @sigma-andex and @JordanMartinez)
 
 New features:
 
