@@ -5,6 +5,17 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+
+New features:
+
+Bugfixes:
+
+Other improvements:
+
+## [v8.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v8.0.0) - 2022-04-27
+
+Breaking changes:
+
 - Update project and deps to PureScript v0.15.0 (#46 by @sigma-andex and @JordanMartinez)
 
 New features:
