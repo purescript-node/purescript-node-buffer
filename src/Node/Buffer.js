@@ -9,7 +9,9 @@ export const writeInternal = (ty, value, offset, buf) =>
 export const writeStringInternal = (encoding, offset, length, value, buff) => 
   buff.write(value, offset, length, encoding);
 
-export const setAtOffsetImpl = (value, offset, buff) => buff[offset] = value;
+export const setAtOffsetImpl = (value, offset, buff) => {
+  buff[offset] = value;
+};
 
 export const copyImpl = (srcStart, srcEnd, src, targStart, targ) => 
   src.copy(targ, targStart, srcStart, srcEnd);
