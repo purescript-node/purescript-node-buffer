@@ -27,9 +27,13 @@ module Node.Buffer.Class
 
 import Prelude
 
+import Control.Monad.ST (ST)
 import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Maybe (Maybe)
+import Effect (Effect)
+import Node.Buffer as Buffer
 import Node.Buffer.Immutable (ImmutableBuffer)
+import Node.Buffer.ST as ST
 import Node.Buffer.Types (BufferValueType, Octet, Offset)
 import Node.Encoding (Encoding)
 
@@ -113,3 +117,53 @@ class Monad m <= MutableBuffer buf m | buf -> m where
 
   -- | Fills a range in a buffer with the specified octet.
   fill :: Octet -> Offset -> Offset -> buf -> m Unit
+
+instance mutableBufferEffect :: MutableBuffer Buffer.Buffer Effect where
+  create = Buffer.create
+  freeze = Buffer.freeze
+  unsafeFreeze = Buffer.unsafeFreeze
+  thaw = Buffer.thaw
+  unsafeThaw = Buffer.unsafeThaw
+  fromArray = Buffer.fromArray
+  fromString = Buffer.fromString
+  fromArrayBuffer = Buffer.fromArrayBuffer
+  toArrayBuffer = Buffer.toArrayBuffer
+  read = Buffer.read
+  readString = Buffer.readString
+  toString = Buffer.toString
+  write = Buffer.write
+  writeString = Buffer.writeString
+  toArray = Buffer.toArray
+  getAtOffset = Buffer.getAtOffset
+  setAtOffset = Buffer.setAtOffset
+  slice = Buffer.slice
+  size = Buffer.size
+  concat = Buffer.concat
+  concat' = Buffer.concat'
+  copy = Buffer.copy
+  fill = Buffer.fill
+
+instance mutableBufferST :: MutableBuffer (ST.STBuffer h) (ST h) where
+  create = ST.create
+  freeze = ST.freeze
+  unsafeFreeze = ST.unsafeFreeze
+  thaw = ST.thaw
+  unsafeThaw = ST.unsafeThaw
+  fromArray = ST.fromArray
+  fromString = ST.fromString
+  fromArrayBuffer = ST.fromArrayBuffer
+  toArrayBuffer = ST.toArrayBuffer
+  read = ST.read
+  readString = ST.readString
+  toString = ST.toString
+  write = ST.write
+  writeString = ST.writeString
+  toArray = ST.toArray
+  getAtOffset = ST.getAtOffset
+  setAtOffset = ST.setAtOffset
+  slice = ST.slice
+  size = ST.size
+  concat = ST.concat
+  concat' = ST.concat'
+  copy = ST.copy
+  fill = ST.fill

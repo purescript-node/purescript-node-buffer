@@ -2,7 +2,6 @@ module Test.Node.Buffer.ST (test) where
 
 import Prelude
 
-import Control.Monad.ST (run) as ST
 import Effect (Effect)
 import Effect.Console (log)
 import Node.Buffer.Class (create)
@@ -23,4 +22,4 @@ test = do
 testRun :: Effect Unit
 testRun = do
   let buf = Immutable.toArray $ run (create 3)
-  assertEqual {expected: [0, 0, 0], actual: buf}
+  assertEqual { expected: [ 0, 0, 0 ], actual: buf }

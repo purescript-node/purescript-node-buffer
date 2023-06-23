@@ -20,8 +20,10 @@ module Node.Buffer.Immutable
 import Prelude
 
 import Data.ArrayBuffer.Types (ArrayBuffer)
-import Data.Maybe (Maybe(..))
-import Node.Buffer.Types (BufferValueType, Octet, Offset)
+import Data.Function.Uncurried (Fn2, Fn3, Fn4, runFn2, runFn3, runFn4)
+import Data.Maybe (Maybe)
+import Data.Nullable (Nullable, toMaybe)
+import Node.Buffer.Types (BufferValueType, Offset, Octet)
 import Node.Encoding (Encoding, encodingToNode)
 
 -- | An immutable buffer that exists independently of any memory region or effect.
@@ -33,18 +35,18 @@ instance showBuffer :: Show ImmutableBuffer where
 foreign import showImpl :: ImmutableBuffer -> String
 
 instance eqBuffer :: Eq ImmutableBuffer where
-  eq = eqImpl
+  eq a b = runFn2 eqImpl a b
 
-foreign import eqImpl :: ImmutableBuffer -> ImmutableBuffer -> Boolean
+foreign import eqImpl :: Fn2 ImmutableBuffer ImmutableBuffer Boolean
 
 instance ordBuffer :: Ord ImmutableBuffer where
   compare a b =
-    case compareImpl a b of
+    case runFn2 compareImpl a b of
       x | x < 0 -> LT
       x | x > 0 -> GT
       _ -> EQ
 
-foreign import compareImpl :: ImmutableBuffer -> ImmutableBuffer -> Int
+foreign import compareImpl :: Fn2 ImmutableBuffer ImmutableBuffer Int
 
 -- | Creates a new buffer of the specified size.
 foreign import create :: Int -> ImmutableBuffer
@@ -59,28 +61,28 @@ foreign import fromArrayBuffer :: ArrayBuffer -> ImmutableBuffer
 
 -- | Creates a new buffer from a string with the specified encoding, sized to match the string.
 fromString :: String -> Encoding -> ImmutableBuffer
-fromString str = fromStringImpl str <<< encodingToNode
+fromString str enc = runFn2 fromStringImpl str $ encodingToNode enc
 
-foreign import fromStringImpl :: String -> String -> ImmutableBuffer
+foreign import fromStringImpl :: Fn2 String String ImmutableBuffer
 
 -- | Reads a numeric value from a buffer at the specified offset.
 read :: BufferValueType -> Offset -> ImmutableBuffer -> Number
-read = readImpl <<< show
+read ty offset buf = runFn3 readImpl (show ty) offset buf
 
-foreign import readImpl :: String -> Offset -> ImmutableBuffer -> Number
+foreign import readImpl :: Fn3 String Offset ImmutableBuffer Number
 
 -- | Reads a section of a buffer as a string with the specified encoding.
 readString :: Encoding -> Offset -> Offset -> ImmutableBuffer -> String
-readString = readStringImpl <<< encodingToNode
+readString enc start end buf = runFn4 readStringImpl (encodingToNode enc) start end buf
 
-foreign import readStringImpl ::
-  String -> Offset -> Offset -> ImmutableBuffer -> String
+foreign import readStringImpl
+  :: Fn4 String Offset Offset ImmutableBuffer String
 
 -- | Reads the buffer as a string with the specified encoding.
 toString :: Encoding -> ImmutableBuffer -> String
-toString = toStringImpl <<< encodingToNode
+toString enc buf = runFn2 toStringImpl (encodingToNode enc) buf
 
-foreign import toStringImpl :: String -> ImmutableBuffer -> String
+foreign import toStringImpl :: Fn2 String ImmutableBuffer String
 
 -- | Creates an array of octets from a buffer's contents.
 foreign import toArray :: ImmutableBuffer -> Array Octet
@@ -90,10 +92,9 @@ foreign import toArrayBuffer :: ImmutableBuffer -> ArrayBuffer
 
 -- | Reads an octet from a buffer at the specified offset.
 getAtOffset :: Offset -> ImmutableBuffer -> Maybe Octet
-getAtOffset = getAtOffsetImpl Just Nothing
+getAtOffset offset buf = toMaybe $ runFn2 getAtOffsetImpl offset buf
 
-foreign import getAtOffsetImpl ::
-  (Octet -> Maybe Octet) -> Maybe Octet -> Offset -> ImmutableBuffer -> Maybe Octet
+foreign import getAtOffsetImpl :: Fn2 Offset ImmutableBuffer (Nullable Octet)
 
 -- | Concatenates a list of buffers.
 foreign import concat :: Array ImmutableBuffer -> ImmutableBuffer
@@ -101,12 +102,15 @@ foreign import concat :: Array ImmutableBuffer -> ImmutableBuffer
 -- | Concatenates a list of buffers, combining them into a new buffer of the
 -- | specified length.
 concat' :: Array ImmutableBuffer -> Int -> ImmutableBuffer
-concat' = concatToLength
+concat' arr i = runFn2 concatToLength arr i
 
-foreign import concatToLength :: Array ImmutableBuffer -> Int -> ImmutableBuffer
+foreign import concatToLength :: Fn2 (Array ImmutableBuffer) Int ImmutableBuffer
 
 -- | Creates a new buffer slice that shares the memory of the original buffer.
-foreign import slice :: Offset -> Offset -> ImmutableBuffer -> ImmutableBuffer
+slice :: Offset -> Offset -> ImmutableBuffer -> ImmutableBuffer
+slice start end buff = runFn3 sliceImpl start end buff
+
+foreign import sliceImpl :: Fn3 Offset Offset ImmutableBuffer ImmutableBuffer
 
 -- | Returns the size of a buffer.
 foreign import size :: ImmutableBuffer -> Int
