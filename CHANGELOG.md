@@ -5,12 +5,29 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+- Invert module dependency of `Node.Buffer.Class` (#51 by @JordanMartinez)
+
+  The `MonadBuffer` type class was seemingly used to expose an API
+  for both `Buffer` and `STBuffer` without duplicating FFI.
+  Members of the class (e.g. `size`, `toString`, etc.) had type inference issues
+  due to this class-based approach.
+
+  Now, both `Buffer` and `STBuffer` expose the same API but with their
+  type signatures hard-coded to `Effect` and `ST`, respectively, thereby
+  improving type inference. `MonadBuffer` instances for both types were 
+  moved into the `Node/Buffer/Class.purs` file. 
+  
+  One can migrate their code by either removing the usage of `MonadClass` in their code
+  if it was only used to get the needed API for a given type (e.g. `Buffer`)
+  or update their module imports from `Node.Buffer`/`Node.Buffer.ST` to `Node.Buffer.Class`.
 
 New features:
 
 Bugfixes:
 
 Other improvements:
+- Update all FFI to use uncurried functions (#51 by @JordanMartinez)
+- Removal of the `Internal.purs` file (#51 by @JordanMartinez)
 
 ## [v8.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v8.0.0) - 2022-04-27
 
