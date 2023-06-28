@@ -2,6 +2,10 @@
 module Node.Buffer
   ( Buffer
   , create
+  , alloc
+  , allocUnsafe
+  , allocUnsafeSlow
+  , compareParts
   , freeze
   , unsafeFreeze
   , thaw
@@ -13,6 +17,7 @@ module Node.Buffer
   , read
   , readString
   , toString
+  , toString'
   , write
   , writeString
   , toArray
@@ -55,8 +60,18 @@ usingFromImmutable f buf = f <$> unsafeFreeze buf
 usingToImmutable :: forall a. (a -> ImmutableBuffer) -> a -> Effect Buffer
 usingToImmutable f x = unsafeThaw $ f x
 
+-- | Alias to `alloc`.
 create :: Int -> Effect Buffer
-create = usingToImmutable Immutable.create
+create = alloc
+
+alloc :: Int -> Effect Buffer
+alloc = usingToImmutable Immutable.alloc
+
+allocUnsafe :: Int -> Effect Buffer
+allocUnsafe = usingToImmutable Immutable.allocUnsafe
+
+allocUnsafeSlow :: Int -> Effect Buffer
+allocUnsafeSlow = usingToImmutable Immutable.allocUnsafeSlow
 
 freeze :: Buffer -> Effect ImmutableBuffer
 freeze = runEffectFn1 freezeImpl
@@ -80,6 +95,12 @@ fromArrayBuffer = usingToImmutable Immutable.fromArrayBuffer
 toArrayBuffer :: Buffer -> Effect ArrayBuffer
 toArrayBuffer = usingFromImmutable Immutable.toArrayBuffer
 
+compareParts :: Buffer -> Buffer -> Int -> Int -> Int -> Int -> Effect Ordering
+compareParts src target targetSrc targetEnd srcStart srcEnd = do
+  src' <- unsafeFreeze src
+  target' <- unsafeFreeze target
+  Immutable.compareParts src' target' targetSrc targetEnd srcStart srcEnd
+
 read :: BufferValueType -> Offset -> Buffer -> Effect Number
 read t o = usingFromImmutable $ Immutable.read t o
 
@@ -88,6 +109,9 @@ readString m o o' = usingFromImmutable $ Immutable.readString m o o'
 
 toString :: Encoding -> Buffer -> Effect String
 toString m = usingFromImmutable $ Immutable.toString m
+
+toString' :: Encoding -> Offset -> Offset -> Buffer -> Effect String
+toString' enc start end = usingFromImmutable $ Immutable.toString' enc start end
 
 write :: BufferValueType -> Number -> Offset -> Buffer -> Effect Unit
 write ty num off buf = runEffectFn4 writeInternal (show ty) num off buf

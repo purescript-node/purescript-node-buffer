@@ -2,6 +2,10 @@ module Node.Buffer.ST
   ( STBuffer
   , run
   , create
+  , alloc
+  , allocUnsafe
+  , allocUnsafeSlow
+  , compareParts
   , freeze
   , unsafeFreeze
   , thaw
@@ -13,6 +17,7 @@ module Node.Buffer.ST
   , read
   , readString
   , toString
+  , toString'
   , write
   , writeString
   , toArray
@@ -54,8 +59,21 @@ unsafeFreeze = unsafeCoerce Buffer.unsafeFreeze
 unsafeThaw :: forall h. ImmutableBuffer -> ST h (STBuffer h)
 unsafeThaw = unsafeCoerce Buffer.unsafeThaw
 
+-- | Creates a new `STBuffer`. Alias of `alloc`.
 create :: forall h. Int -> ST h (STBuffer h)
-create = unsafeCoerce Buffer.create
+create = alloc
+
+alloc :: forall h. Int -> ST h (STBuffer h)
+alloc = unsafeCoerce Buffer.alloc
+
+allocUnsafe :: forall h. Int -> ST h (STBuffer h)
+allocUnsafe = unsafeCoerce Buffer.allocUnsafe
+
+allocUnsafeSlow :: forall h. Int -> ST h (STBuffer h)
+allocUnsafeSlow = unsafeCoerce Buffer.allocUnsafeSlow
+
+compareParts :: forall h. STBuffer h -> STBuffer h -> Int -> Int -> Int -> Int -> ST h Ordering
+compareParts = unsafeCoerce Buffer.compareParts
 
 freeze :: forall h. (STBuffer h) -> ST h ImmutableBuffer
 freeze = unsafeCoerce Buffer.freeze
@@ -83,6 +101,9 @@ readString = unsafeCoerce Buffer.readString
 
 toString :: forall h. Encoding -> (STBuffer h) -> ST h String
 toString = unsafeCoerce Buffer.toString
+
+toString' :: forall h. Encoding -> Offset -> Offset -> (STBuffer h) -> ST h String
+toString' = unsafeCoerce Buffer.toString'
 
 write :: forall h. BufferValueType -> Number -> Offset -> (STBuffer h) -> ST h Unit
 write = unsafeCoerce Buffer.write

@@ -4,7 +4,12 @@ export const showImpl = inspect;
 
 export const eqImpl = (a, b) => a.equals(b);
 export const compareImpl = (a, b) => a.compare(b);
-export const create = (size) => Buffer.alloc(size);
+export const comparePartsImpl = (src, target, targetStart, targetEnd, sourceStart, sourceEnd) => 
+  src.compare(target, targetStart, targetEnd, sourceStart, sourceEnd);
+
+export const alloc = (size) => Buffer.alloc(size);
+export const allocUnsafe = (size) => Buffer.allocUnsafe(size);
+export const allocUnsafeSlow = (size) => Buffer.allocUnsafeSlow(size);
 
 export const fromArray = (octets) => Buffer.from(octets);
 
@@ -25,6 +30,7 @@ export const readImpl = (ty, offset, buf) => buf["read" + ty](offset);
 export const readStringImpl = (enc, start, end, buff) => buff.toString(enc, start, end);
 export const getAtOffsetImpl = (offset, buff) => buff[offset];
 export const toStringImpl = (enc, buff) => buff.toString(enc);
+export const toStringSubImpl = (enc, start, end, buff) => buff.toString(enc, start, end);
 export const sliceImpl = (start, end, buff) => buff.slice(start, end);
 export const concat = (buffs) => Buffer.concat(buffs);
 export const concatToLength = (buffs, totalLength) => Buffer.concat(buffs, totalLength);
