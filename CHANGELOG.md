@@ -20,8 +20,24 @@ Breaking changes:
   One can migrate their code by either removing the usage of `MonadClass` in their code
   if it was only used to get the needed API for a given type (e.g. `Buffer`)
   or update their module imports from `Node.Buffer`/`Node.Buffer.ST` to `Node.Buffer.Class`.
+- `Encoding` type - dropped encodings that are only aliases (#51 by @JordanMartinez)
+
+  - `Binary`, an alias for `Latin1` was dropped.
+  - `UCS2`, an alias for `UTF16LE` was dropped.
+- `Encoding` type - added `Base64Url` encoding (supported in Node 18) (#51 by @JordanMartinez)
 
 New features:
+- Added the following APIs
+
+  - `Buffer.alloc`, `Buffer.allocUnsafe`, `Buffer.allocUnsafeSlow`
+  - `Buffer.poolSize`, `Buffer.setPoolSize`
+  - `buffer.swap16`, `buffer.swap32`, `buffer.swap64`
+  - `buffer.compare`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufcomparetarget-targetstart-targetend-sourcestart-sourceend
+  - `buffer.toString(encoding, start, end)`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#buftostringencoding-start-end
+  - constants: 
+    - `INSPECT_MAX_BYTES`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferinspect_max_bytes
+    - `MAX_LENGTH`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferconstantsmax_length
+    - `MAX_STRING_LENGTH`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferconstantsmax_string_length
 
 Bugfixes:
 
