@@ -1,5 +1,8 @@
 import { Buffer } from "node:buffer";
 
+export const allocUnsafeImpl = (size) => Buffer.allocUnsafe(size);
+export const allocUnsafeSlowImpl = (size) => Buffer.allocUnsafeSlow(size);
+
 export const freezeImpl= (a) => Buffer.from(a);
 
 export const thawImpl = (a) => Buffer.from(a);

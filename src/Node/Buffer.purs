@@ -72,11 +72,19 @@ create = alloc
 alloc :: Int -> Effect Buffer
 alloc = usingToImmutable Immutable.alloc
 
+-- | Creates a new buffer of the specified size. Unsafe because it reuses memory from a pool
+-- | and may contain sensitive data. See the Node docs.
 allocUnsafe :: Int -> Effect Buffer
-allocUnsafe = usingToImmutable Immutable.allocUnsafe
+allocUnsafe s = runEffectFn1 allocUnsafeImpl s
 
+foreign import allocUnsafeImpl :: EffectFn1 (Int) (Buffer)
+
+-- | Creates a new buffer of the specified size. Unsafe because it reuses memory from a pool
+-- | and may contain sensitive data. See the Node docs.
 allocUnsafeSlow :: Int -> Effect Buffer
-allocUnsafeSlow = usingToImmutable Immutable.allocUnsafeSlow
+allocUnsafeSlow s = runEffectFn1 allocUnsafeSlowImpl s
+
+foreign import allocUnsafeSlowImpl :: EffectFn1 (Int) (Buffer)
 
 freeze :: Buffer -> Effect ImmutableBuffer
 freeze = runEffectFn1 freezeImpl

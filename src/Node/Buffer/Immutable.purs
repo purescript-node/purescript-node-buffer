@@ -4,8 +4,6 @@ module Node.Buffer.Immutable
   , compareParts
   , create
   , alloc
-  , allocUnsafe
-  , allocUnsafeSlow
   , fromArray
   , fromString
   , fromArrayBuffer
@@ -61,14 +59,6 @@ create :: Int -> ImmutableBuffer
 create = alloc
 
 foreign import alloc :: Int -> ImmutableBuffer
-
--- | Creates a new buffer of the specified size. Unsafe because it reuses memory from a pool
--- | and may contain sensitive data. See the Node docs.
-foreign import allocUnsafe :: Int -> ImmutableBuffer
-
--- | Creates a new buffer of the specified size. Unsafe because it reuses memory from a pool
--- | and may contain sensitive data. See the Node docs.
-foreign import allocUnsafeSlow :: Int -> ImmutableBuffer
 
 -- | Creates a new buffer from an array of octets, sized to match the array.
 foreign import fromArray :: Array Octet -> ImmutableBuffer

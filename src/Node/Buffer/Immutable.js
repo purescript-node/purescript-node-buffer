@@ -8,8 +8,6 @@ export const comparePartsImpl = (src, target, targetStart, targetEnd, sourceStar
   src.compare(target, targetStart, targetEnd, sourceStart, sourceEnd);
 
 export const alloc = (size) => Buffer.alloc(size);
-export const allocUnsafe = (size) => Buffer.allocUnsafe(size);
-export const allocUnsafeSlow = (size) => Buffer.allocUnsafeSlow(size);
 
 export const fromArray = (octets) => Buffer.from(octets);
 
