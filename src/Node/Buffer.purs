@@ -29,6 +29,11 @@ module Node.Buffer
   , concat'
   , copy
   , fill
+  , poolSize
+  , setPoolSize
+  , swap16
+  , swap32
+  , swap64
   , module TypesExports
   ) where
 
@@ -159,3 +164,26 @@ fill octet start end buf =
   runEffectFn4 fillImpl octet start end buf
 
 foreign import fillImpl :: EffectFn4 Octet Offset Offset Buffer Unit
+
+-- | The size (in bytes) of pre-allocated internal Buffer instances used for pooling. This value may be modified.
+foreign import poolSize :: Effect (Int)
+
+setPoolSize :: Int -> Effect Unit
+setPoolSize sizeInBytes = runEffectFn1 setPoolSizeImpl sizeInBytes
+
+foreign import setPoolSizeImpl :: EffectFn1 (Int) (Unit)
+
+swap16 :: Buffer -> Effect Buffer
+swap16 b = runEffectFn1 swap16Impl b
+
+foreign import swap16Impl :: EffectFn1 (Buffer) (Buffer)
+
+swap32 :: Buffer -> Effect Buffer
+swap32 b = runEffectFn1 swap32Impl b
+
+foreign import swap32Impl :: EffectFn1 (Buffer) (Buffer)
+
+swap64 :: Buffer -> Effect Buffer
+swap64 b = runEffectFn1 swap64Impl b
+
+foreign import swap64Impl :: EffectFn1 (Buffer) (Buffer)

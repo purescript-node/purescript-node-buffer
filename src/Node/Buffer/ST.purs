@@ -29,6 +29,9 @@ module Node.Buffer.ST
   , concat'
   , copy
   , fill
+  , swap16
+  , swap32
+  , swap64
   ) where
 
 import Prelude
@@ -138,3 +141,12 @@ copy = unsafeCoerce Buffer.copy
 
 fill :: forall h. Octet -> Offset -> Offset -> (STBuffer h) -> ST h Unit
 fill = unsafeCoerce Buffer.fill
+
+swap16 :: forall h. STBuffer h -> ST h (STBuffer h)
+swap16 = unsafeCoerce Buffer.swap16
+
+swap32 :: forall h. STBuffer h -> ST h (STBuffer h)
+swap32 = unsafeCoerce Buffer.swap32
+
+swap64 :: forall h. STBuffer h -> ST h (STBuffer h)
+swap64 = unsafeCoerce Buffer.swap64

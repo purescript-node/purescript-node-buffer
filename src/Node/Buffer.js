@@ -1,4 +1,5 @@
-/* global Buffer */
+import { Buffer } from "node:buffer";
+
 export const freezeImpl= (a) => Buffer.from(a);
 
 export const thawImpl = (a) => Buffer.from(a);
@@ -17,3 +18,13 @@ export const copyImpl = (srcStart, srcEnd, src, targStart, targ) =>
   src.copy(targ, targStart, srcStart, srcEnd);
 
 export const fillImpl = (octet, start, end, buf) => buf.fill(octet, start, end);
+
+export const poolSize = () => Buffer.poolSize;
+
+export const setPoolSizeImpl = (size) => { 
+  Buffer.poolSize = size; 
+};
+
+export const swap16Impl = (buf) => buf.swap16();
+export const swap32Impl = (buf) => buf.swap32();
+export const swap64Impl = (buf) => buf.swap64();
