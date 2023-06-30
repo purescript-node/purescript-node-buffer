@@ -73,8 +73,8 @@ foreign import readImpl :: String -> Offset -> ImmutableBuffer -> Number
 readString :: Encoding -> Offset -> Offset -> ImmutableBuffer -> String
 readString = readStringImpl <<< encodingToNode
 
-foreign import readStringImpl ::
-  String -> Offset -> Offset -> ImmutableBuffer -> String
+foreign import readStringImpl
+  :: String -> Offset -> Offset -> ImmutableBuffer -> String
 
 -- | Reads the buffer as a string with the specified encoding.
 toString :: Encoding -> ImmutableBuffer -> String
@@ -92,8 +92,8 @@ foreign import toArrayBuffer :: ImmutableBuffer -> ArrayBuffer
 getAtOffset :: Offset -> ImmutableBuffer -> Maybe Octet
 getAtOffset = getAtOffsetImpl Just Nothing
 
-foreign import getAtOffsetImpl ::
-  (Octet -> Maybe Octet) -> Maybe Octet -> Offset -> ImmutableBuffer -> Maybe Octet
+foreign import getAtOffsetImpl
+  :: (Octet -> Maybe Octet) -> Maybe Octet -> Offset -> ImmutableBuffer -> Maybe Octet
 
 -- | Concatenates a list of buffers.
 foreign import concat :: Array ImmutableBuffer -> ImmutableBuffer

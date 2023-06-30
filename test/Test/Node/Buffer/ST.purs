@@ -23,4 +23,4 @@ test = do
 testRun :: Effect Unit
 testRun = do
   let buf = Immutable.toArray $ run (create 3)
-  assertEqual {expected: [0, 0, 0], actual: buf}
+  assertEqual { expected: [ 0, 0, 0 ], actual: buf }
