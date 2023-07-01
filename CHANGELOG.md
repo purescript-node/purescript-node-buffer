@@ -5,6 +5,43 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+- Expose Buffer API using typeclass-less API witout removing typeclass API (#53 by @JordanMartinez)
+
+  Previously, compiler would fail to infer the type of `Buffer.create 1` as `Effect Buffer` 
+  because the Buffer API was exposed only via the multiparameter typeclass `MonadBuffer`.
+  Due to the functional dependency between the two parameters, the monadic type cannot be inferred
+  until the buffer type is known (either `Buffer` or `STBuffer`).:
+  ```purs
+  import Node.Buffer as Buffer
+
+  -- Example 1
+  main :: Effect Unit
+  main = do
+    x <- Buffer.create 1 -- compiler: is this `Int -> Effect Buffer` or `Int -> ST h (STBuffer h)?
+    pure unit
+  ```
+
+  The workaround was to add a type annotation, indicating the `x` is a `Buffer`:
+  ```purs
+  import Node.Buffer as Buffer
+  
+  -- Example 2
+  main :: Effect Unit
+  main = do
+    x :: Buffer <- Buffer.create 1 -- compiler: Oh! It's `Int -> Effect Buffer`
+    pure unit
+  ```
+
+  This change does not break anyone's code if one was using a `create` (or another such typeclass member)
+  to get `Int -> Effect Buffer`. Rather, such users can now drop the `:: Buffer` annotation 
+  (i.e. Example 1 above now compiles).
+
+  If one was using `create` to get `forall m buf. MonadBuffer buf m => Int -> m buf`,
+  then one will need to update their imports:
+  ```diff
+  -import Node.Buffer (class MonadBuffer)
+  +import Node.Buffer.Class (class MonadBuffer)
+  ```
 
 New features:
 

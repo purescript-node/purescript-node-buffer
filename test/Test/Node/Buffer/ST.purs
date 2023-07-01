@@ -2,7 +2,6 @@ module Test.Node.Buffer.ST (test) where
 
 import Prelude
 
-import Control.Monad.ST (run) as ST
 import Effect (Effect)
 import Effect.Console (log)
 import Node.Buffer.Class (create)
