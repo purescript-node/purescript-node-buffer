@@ -73,71 +73,71 @@ instance mutableBufferST :: MutableBuffer (STBuffer h) (ST h) where
   copy = copy
   fill = fill
 
-create :: forall (h :: Region). Int -> ST h (STBuffer h)
+create :: forall h. Int -> ST h (STBuffer h)
 create = Internal.create
 
-freeze :: forall (h :: Region). STBuffer h -> ST h ImmutableBuffer
+freeze :: forall h. STBuffer h -> ST h ImmutableBuffer
 freeze = Internal.copyAll
 
-unsafeFreeze :: forall (h :: Region). STBuffer h -> ST h ImmutableBuffer
+unsafeFreeze :: forall h. STBuffer h -> ST h ImmutableBuffer
 unsafeFreeze = Internal.unsafeFreeze
 
-thaw :: forall (h :: Region). ImmutableBuffer -> ST h (STBuffer h)
+thaw :: forall h. ImmutableBuffer -> ST h (STBuffer h)
 thaw = Internal.copyAll
 
-unsafeThaw :: forall (h :: Region). ImmutableBuffer -> ST h (STBuffer h)
+unsafeThaw :: forall h. ImmutableBuffer -> ST h (STBuffer h)
 unsafeThaw = Internal.unsafeThaw
 
-fromArray :: forall (h :: Region). Array Int -> ST h (STBuffer h)
+fromArray :: forall h. Array Int -> ST h (STBuffer h)
 fromArray = Internal.fromArray
 
-fromString :: forall (h :: Region). String -> Encoding -> ST h (STBuffer h)
+fromString :: forall h. String -> Encoding -> ST h (STBuffer h)
 fromString = Internal.fromString
 
-fromArrayBuffer :: forall (h :: Region). ArrayBuffer -> ST h (STBuffer h)
+fromArrayBuffer :: forall h. ArrayBuffer -> ST h (STBuffer h)
 fromArrayBuffer = Internal.fromArrayBuffer
 
-toArrayBuffer :: forall (h :: Region). STBuffer h -> ST h ArrayBuffer
+toArrayBuffer :: forall h. STBuffer h -> ST h ArrayBuffer
 toArrayBuffer = Internal.toArrayBuffer
 
-read :: forall (h :: Region). BufferValueType -> Int -> STBuffer h -> ST h Number
+read :: forall h. BufferValueType -> Int -> STBuffer h -> ST h Number
 read = Internal.read
 
-readString :: forall (h :: Region). Encoding -> Int -> Int -> STBuffer h -> ST h String
+readString :: forall h. Encoding -> Int -> Int -> STBuffer h -> ST h String
 readString = Internal.readString
 
-toString :: forall (h :: Region). Encoding -> STBuffer h -> ST h String
+toString :: forall h. Encoding -> STBuffer h -> ST h String
 toString = Internal.toString
 
-write :: forall (h :: Region). BufferValueType -> Number -> Int -> STBuffer h -> ST h Unit
+write :: forall h. BufferValueType -> Number -> Int -> STBuffer h -> ST h Unit
 write = Internal.write
 
-writeString :: forall (h :: Region). Encoding -> Int -> Int -> String -> STBuffer h -> ST h Int
+writeString :: forall h. Encoding -> Int -> Int -> String -> STBuffer h -> ST h Int
 writeString = Internal.writeString
 
-toArray :: forall (h :: Region). STBuffer h -> ST h (Array Int)
+toArray :: forall h. STBuffer h -> ST h (Array Int)
 toArray = Internal.toArray
 
-getAtOffset :: forall (h :: Region). Int -> STBuffer h -> ST h (Maybe Int)
+getAtOffset :: forall h. Int -> STBuffer h -> ST h (Maybe Int)
 getAtOffset = Internal.getAtOffset
 
-setAtOffset :: forall (h :: Region). Int -> Int -> STBuffer h -> ST h Unit
+setAtOffset :: forall h. Int -> Int -> STBuffer h -> ST h Unit
 setAtOffset = Internal.setAtOffset
 
-slice :: forall (h :: Region). Int -> Int -> STBuffer h -> STBuffer h
+slice :: forall h. Int -> Int -> STBuffer h -> STBuffer h
 slice = Internal.slice
 
-size :: forall (h :: Region). STBuffer h -> ST h Int
+size :: forall h. STBuffer h -> ST h Int
 size = Internal.size
 
-concat :: forall (h :: Region). Array (STBuffer h) -> ST h (STBuffer h)
+concat :: forall h. Array (STBuffer h) -> ST h (STBuffer h)
 concat = Internal.concat
 
-concat' :: forall (h :: Region). Array (STBuffer h) -> Int -> ST h (STBuffer h)
+concat' :: forall h. Array (STBuffer h) -> Int -> ST h (STBuffer h)
 concat' = Internal.concat'
 
-copy :: forall (h :: Region). Int -> Int -> STBuffer h -> Int -> STBuffer h -> ST h Int
+copy :: forall h. Int -> Int -> STBuffer h -> Int -> STBuffer h -> ST h Int
 copy = Internal.copy
 
-fill :: forall (h :: Region). Int -> Int -> Int -> STBuffer h -> ST h Unit
+fill :: forall h. Int -> Int -> Int -> STBuffer h -> ST h Unit
 fill = Internal.fill
