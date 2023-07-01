@@ -82,8 +82,8 @@ foreign import writeInternal :: forall buf m. String -> Number -> Offset -> buf 
 writeString :: forall buf m. Monad m => Encoding -> Offset -> Int -> String -> buf -> m Int
 writeString = writeStringInternal <<< encodingToNode
 
-foreign import writeStringInternal ::
-  forall buf m. String -> Offset -> Int -> String -> buf -> m Int
+foreign import writeStringInternal
+  :: forall buf m. String -> Offset -> Int -> String -> buf -> m Int
 
 toArray :: forall buf m. Monad m => buf -> m (Array Octet)
 toArray = usingFromImmutable Immutable.toArray
