@@ -102,7 +102,7 @@ alloc = usingToImmutable Immutable.alloc
 
 -- | Creates a new buffer of the specified size. Unsafe because it reuses memory from a pool
 -- | and may contain sensitive data. See the Node docs: 
--- | https://nodejs.org/docs/latest-v16.x/api/buffer.html#what-makes-bufferallocunsafe-and-bufferallocunsafeslow-unsafe
+-- | https://nodejs.org/docs/latest-v18.x/api/buffer.html#what-makes-bufferallocunsafe-and-bufferallocunsafeslow-unsafe
 allocUnsafe :: Int -> Effect Buffer
 allocUnsafe s = runEffectFn1 allocUnsafeImpl s
 
@@ -110,7 +110,7 @@ foreign import allocUnsafeImpl :: EffectFn1 (Int) (Buffer)
 
 -- | Creates a new buffer of the specified size. Unsafe because it reuses memory from a pool
 -- | and may contain sensitive data. See the Node docs: 
--- | https://nodejs.org/docs/latest-v16.x/api/buffer.html#what-makes-bufferallocunsafe-and-bufferallocunsafeslow-unsafe
+-- | https://nodejs.org/docs/latest-v18.x/api/buffer.html#what-makes-bufferallocunsafe-and-bufferallocunsafeslow-unsafe
 allocUnsafeSlow :: Int -> Effect Buffer
 allocUnsafeSlow s = runEffectFn1 allocUnsafeSlowImpl s
 

@@ -87,12 +87,19 @@ instance mutableBufferST :: MutableBuffer (STBuffer h) (ST h) where
 create :: forall h. Int -> ST h (STBuffer h)
 create = alloc
 
+-- | Creates a new `STBuffer`.
 alloc :: forall h. Int -> ST h (STBuffer h)
 alloc = unsafeCoerce Buffer.alloc
 
+-- | Creates a new `STBuffer` of the specified size. Unsafe because it reuses memory from a pool
+-- | and may contain sensitive data. See the Node docs: 
+-- | https://nodejs.org/docs/latest-v18.x/api/buffer.html#what-makes-bufferallocunsafe-and-bufferallocunsafeslow-unsafe
 allocUnsafe :: forall h. Int -> ST h (STBuffer h)
 allocUnsafe = unsafeCoerce Buffer.allocUnsafe
 
+-- | Creates a new `STBuffer` of the specified size. Unsafe because it reuses memory from a pool
+-- | and may contain sensitive data. See the Node docs: 
+-- | https://nodejs.org/docs/latest-v18.x/api/buffer.html#what-makes-bufferallocunsafe-and-bufferallocunsafeslow-unsafe
 allocUnsafeSlow :: forall h. Int -> ST h (STBuffer h)
 allocUnsafeSlow = unsafeCoerce Buffer.allocUnsafeSlow
 
