@@ -32,6 +32,7 @@ module Node.Buffer.ST
   , swap16
   , swap32
   , swap64
+  , transcode
   ) where
 
 import Prelude
@@ -176,3 +177,6 @@ swap32 = unsafeCoerce Buffer.swap32
 
 swap64 :: forall h. STBuffer h -> ST h (STBuffer h)
 swap64 = unsafeCoerce Buffer.swap64
+
+transcode :: forall h. STBuffer h -> Encoding -> Encoding -> ST h (STBuffer h)
+transcode = unsafeCoerce Buffer.transcode
