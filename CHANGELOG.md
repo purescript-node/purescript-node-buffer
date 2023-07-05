@@ -56,7 +56,7 @@ New features:
     - `INSPECT_MAX_BYTES`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferinspect_max_bytes
     - `MAX_LENGTH`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferconstantsmax_length
     - `MAX_STRING_LENGTH`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferconstantsmax_string_length
-
+- Added a new data constructor for `Encoding`: `Base64Url` (#56 by @JordanMartinez)
 
 Bugfixes:
 
