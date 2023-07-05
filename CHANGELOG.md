@@ -44,6 +44,19 @@ Breaking changes:
   ```
 
 New features:
+- Added the following APIs (#55 by @JordanMartinez)
+
+  - `Buffer.alloc`, `Buffer.allocUnsafe`, `Buffer.allocUnsafeSlow`
+  - `Buffer.poolSize`, `Buffer.setPoolSize`
+  - `buffer.swap16`, `buffer.swap32`, `buffer.swap64`
+  - `buffer.compare`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufcomparetarget-targetstart-targetend-sourcestart-sourceend
+  - `buffer.toString(encoding, start, end)`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#buftostringencoding-start-end
+  - `buffer.transcode(buf, from, to)`
+  - constants: 
+    - `INSPECT_MAX_BYTES`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferinspect_max_bytes
+    - `MAX_LENGTH`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferconstantsmax_length
+    - `MAX_STRING_LENGTH`: https://nodejs.org/docs/latest-v18.x/api/buffer.html#bufferconstantsmax_string_length
+
 
 Bugfixes:
 
