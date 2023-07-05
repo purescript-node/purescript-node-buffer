@@ -64,6 +64,8 @@ Other improvements:
 - Format code with `purs-tidy`; enforce in CI (#52 by @JordanMartinez)
 - Update FFI to use uncurried functions (#54 by @JordanMartinez)
 - Removed `Internal.purs` file (#54 by @JordanMartinez)
+- Bumped CI's node version to `latest` (#55 by @JordanMartinez)
+- Updated CI `actions/checkout` and `actions/setup-nodee` to `v3` (#55 by @JordanMartinez)
 
 ## [v8.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v8.0.0) - 2022-04-27
 
