@@ -136,7 +136,7 @@ fromArrayBuffer = usingToImmutable Immutable.fromArrayBuffer
 toArrayBuffer :: Buffer -> Effect ArrayBuffer
 toArrayBuffer = usingFromImmutable Immutable.toArrayBuffer
 
-compareParts :: Buffer -> Buffer -> Int -> Int -> Int -> Int -> Effect Ordering
+compareParts :: Buffer -> Buffer -> Offset -> Offset -> Offset -> Offset -> Effect Ordering
 compareParts src target targetSrc targetEnd srcStart srcEnd = do
   src' <- unsafeFreeze src
   target' <- unsafeFreeze target

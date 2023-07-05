@@ -73,7 +73,7 @@ fromString str enc = runFn2 fromStringImpl str $ encodingToNode enc
 
 foreign import fromStringImpl :: Fn2 String String ImmutableBuffer
 
-compareParts :: ImmutableBuffer -> ImmutableBuffer -> Int -> Int -> Int -> Int -> Effect Ordering
+compareParts :: ImmutableBuffer -> ImmutableBuffer -> Offset -> Offset -> Offset -> Offset -> Effect Ordering
 compareParts src target targetStart targetEnd sourceStart sourceEnd =
   runEffectFn6 comparePartsImpl src target targetStart targetEnd sourceStart sourceEnd <#> case _ of
     -1 -> LT
