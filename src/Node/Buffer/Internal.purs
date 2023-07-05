@@ -5,7 +5,8 @@ module Node.Buffer.Internal
   , usingFromImmutable
   , usingToImmutable
   , create
-  , copyAll
+  , freeze
+  , thaw
   , fromArray
   , fromString
   , fromArrayBuffer
@@ -30,81 +31,102 @@ import Prelude
 
 import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Maybe (Maybe)
+import Effect.Uncurried (EffectFn1, EffectFn3, EffectFn4, EffectFn5, runEffectFn1, runEffectFn3, runEffectFn4, runEffectFn5)
+import Node.Buffer.Class (freeze, thaw)
 import Node.Buffer.Immutable (ImmutableBuffer)
 import Node.Buffer.Immutable as Immutable
 import Node.Buffer.Types (BufferValueType, Octet, Offset)
 import Node.Encoding (Encoding, encodingToNode)
 import Unsafe.Coerce (unsafeCoerce)
 
-unsafeFreeze :: forall buf m. Monad m => buf -> m ImmutableBuffer
+unsafeFreeze :: Buffer -> Effect ImmutableBuffer
 unsafeFreeze = pure <<< unsafeCoerce
 
-unsafeThaw :: forall buf m. Monad m => ImmutableBuffer -> m buf
+unsafeThaw :: ImmutableBuffer -> Effect Buffer
 unsafeThaw = pure <<< unsafeCoerce
 
-usingFromImmutable :: forall buf m a. Monad m => (ImmutableBuffer -> a) -> buf -> m a
+usingFromImmutable :: forall a. (ImmutableBuffer -> a) -> Buffer -> Effect a
 usingFromImmutable f buf = f <$> unsafeFreeze buf
 
-usingToImmutable :: forall buf m a. Monad m => (a -> ImmutableBuffer) -> a -> m buf
+usingToImmutable :: forall a. (a -> ImmutableBuffer) -> a -> Effect Buffer
 usingToImmutable f x = unsafeThaw $ f x
 
-create :: forall buf m. Monad m => Int -> m buf
+create :: Int -> Effect Buffer
 create = usingToImmutable Immutable.create
 
-foreign import copyAll :: forall a buf m. a -> m buf
+freeze :: Buffer -> Effect ImmutableBuffer
+freeze = runEffectFn1 freezeImpl
 
-fromArray :: forall buf m. Monad m => Array Octet -> m buf
+foreign import freezeImpl :: EffectFn1 Buffer ImmutableBuffer
+
+thaw :: ImmutableBuffer -> Effect Buffer
+thaw = runEffectFn1 thawImpl
+
+foreign import thawImpl :: EffectFn1 ImmutableBuffer Buffer
+
+fromArray :: Array Octet -> Effect Buffer
 fromArray = usingToImmutable Immutable.fromArray
 
-fromString :: forall buf m. Monad m => String -> Encoding -> m buf
+fromString :: String -> Encoding -> Effect Buffer
 fromString s = usingToImmutable $ Immutable.fromString s
 
-fromArrayBuffer :: forall buf m. Monad m => ArrayBuffer -> m buf
+fromArrayBuffer :: ArrayBuffer -> Effect Buffer
 fromArrayBuffer = usingToImmutable Immutable.fromArrayBuffer
 
-toArrayBuffer :: forall buf m. Monad m => buf -> m ArrayBuffer
+toArrayBuffer :: Buffer -> Effect ArrayBuffer
 toArrayBuffer = usingFromImmutable Immutable.toArrayBuffer
 
-read :: forall buf m. Monad m => BufferValueType -> Offset -> buf -> m Number
+read :: BufferValueType -> Offset -> Buffer -> Effect Number
 read t o = usingFromImmutable $ Immutable.read t o
 
-readString :: forall buf m. Monad m => Encoding -> Offset -> Offset -> buf -> m String
-readString m o o' = usingFromImmutable $ Immutable.readString m o o'
+readString :: Encoding -> Offset -> Offset -> Buffer -> Effect String
+readString enc o o' = usingFromImmutable $ Immutable.readString enc o o'
 
-toString :: forall buf m. Monad m => Encoding -> buf -> m String
-toString m = usingFromImmutable $ Immutable.toString m
+toString :: Encoding -> Buffer -> Effect String
+toString enc = usingFromImmutable $ Immutable.toString enc
 
-write :: forall buf m. Monad m => BufferValueType -> Number -> Offset -> buf -> m Unit
-write = writeInternal <<< show
+write :: BufferValueType -> Number -> Offset -> Buffer -> Effect Unit
+write ty value offset buf = runEffectFn4 writeInternal (show ty) value offset buf
 
-foreign import writeInternal :: forall buf m. String -> Number -> Offset -> buf -> m Unit
+foreign import writeInternal :: EffectFn4 String Number Offset Buffer Unit
 
-writeString :: forall buf m. Monad m => Encoding -> Offset -> Int -> String -> buf -> m Int
-writeString = writeStringInternal <<< encodingToNode
+writeString :: Encoding -> Offset -> Int -> String -> Buffer -> Effect Int
+writeString enc offset len value buf =
+  runEffectFn5 writeStringInternal (encodingToNode enc) offset len value buf
 
-foreign import writeStringInternal
-  :: forall buf m. String -> Offset -> Int -> String -> buf -> m Int
+foreign import writeStringInternal :: EffectFn5 String Offset Int String Buffer Int
 
-toArray :: forall buf m. Monad m => buf -> m (Array Octet)
+toArray :: Buffer -> Effect (Array Octet)
 toArray = usingFromImmutable Immutable.toArray
 
-getAtOffset :: forall buf m. Monad m => Offset -> buf -> m (Maybe Octet)
+getAtOffset :: Offset -> Buffer -> Effect (Maybe Octet)
 getAtOffset o = usingFromImmutable $ Immutable.getAtOffset o
 
-foreign import setAtOffset :: forall buf m. Octet -> Offset -> buf -> m Unit
+setAtOffset :: Octet -> Offset -> Buffer -> Effect Unit
+setAtOffset val off buff = runEffectFn3 setAtOffsetImpl val off buff
 
-slice :: forall buf. Offset -> Offset -> buf -> buf
+foreign import setAtOffsetImpl :: EffectFn3 Octet Offset Buffer Unit
+
+slice :: Offset -> Offset -> Buffer -> Buffer
 slice = unsafeCoerce Immutable.slice
 
-size :: forall buf m. Monad m => buf -> m Int
+size :: Buffer -> Effect Int
 size = usingFromImmutable Immutable.size
 
-concat :: forall buf m. Array buf -> m buf
+concat :: Array Buffer -> Effect Buffer
 concat arrs = unsafeCoerce \_ -> Immutable.concat (unsafeCoerce arrs)
 
-concat' :: forall buf m. Monad m => Array buf -> Int -> m buf
+concat' :: Array Buffer -> Int -> Effect Buffer
 concat' arrs n = unsafeCoerce \_ -> Immutable.concat' (unsafeCoerce arrs) n
 
-foreign import copy :: forall buf m. Offset -> Offset -> buf -> Offset -> buf -> m Int
+copy :: Offset -> Offset -> Buffer -> Offset -> Buffer -> Effect Int
+copy srcStart srcEnd src targStart targ = do
+  runEffectFn5 copyImpl srcStart srcEnd src targStart targ
 
-foreign import fill :: forall buf m. Octet -> Offset -> Offset -> buf -> m Unit
+foreign import copyImpl :: EffectFn5 Offset Offset Buffer Offset Buffer Int
+
+fill :: Octet -> Offset -> Offset -> Buffer -> Effect Unit
+fill octet start end buf = do
+  runEffectFn4 fillImpl octet start end buf
+
+foreign import fillImpl :: EffectFn4 Octet Offset Offset Buffer Unit

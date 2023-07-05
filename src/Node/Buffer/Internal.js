@@ -1,68 +1,19 @@
-/* global Buffer */
-export function copyAll(a) {
-  return () => {
-    return Buffer.from(a);
-  };
-}
+import { Buffer } from "node:buffer";
 
-export function writeInternal(ty) {
-  return value => {
-    return offset => {
-      return buf => {
-        return () => {
-          buf["write" + ty](value, offset);
-        };
-      };
-    };
-  };
-}
+export const freezeImpl = (a) => Buffer.from(a);
+export const thawImpl = (a) => Buffer.from(a);
 
-export function writeStringInternal(encoding) {
-  return offset => {
-    return length => {
-      return value => {
-        return buff => {
-          return () => {
-            return buff.write(value, offset, length, encoding);
-          };
-        };
-      };
-    };
-  };
-}
+export const writeInternal = (ty, value, offset, buf) => buf["write" + ty](value, offset);
 
-export function setAtOffset(value) {
-  return offset => {
-    return buff => {
-      return () => {
-        buff[offset] = value;
-      };
-    };
-  };
-}
+export const writeStringInternal = (encoding, offset, length, value, buff) =>
+  buff.write(value, offset, length, encoding);
 
-export function copy(srcStart) {
-  return srcEnd => {
-    return src => {
-      return targStart => {
-        return targ => {
-          return () => {
-            return src.copy(targ, targStart, srcStart, srcEnd);
-          };
-        };
-      };
-    };
-  };
-}
+export const setAtOffsetImpl = (value, offset, buff) => {
+  buff[offset] = value;
+};
 
-export function fill(octet) {
-  return start => {
-    return end => {
-      return buf => {
-        return () => {
-          buf.fill(octet, start, end);
-        };
-      };
-    };
-  };
-}
+export const copyImpl = (srcStart, srcEnd, src, targStart, targ) =>
+  src.copy(targ, targStart, srcStart, srcEnd);
+
+export const fillImpl = (octet, start, end, buf) =>
+  buf.fill(octet, start, end);

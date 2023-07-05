@@ -17,7 +17,8 @@
     "purescript-effect": "^4.0.0",
     "purescript-maybe": "^6.0.0",
     "purescript-st": "^6.0.0",
-    "purescript-unsafe-coerce": "^6.0.0"
+    "purescript-unsafe-coerce": "^6.0.0",
+    "purescript-nullable": "^6.0.0"
   },
   "devDependencies": {
     "purescript-assert": "^6.0.0",

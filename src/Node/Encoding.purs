@@ -6,6 +6,8 @@ module Node.Encoding
 
 import Prelude
 
+import Data.Function.Uncurried (Fn2, runFn2)
+
 data Encoding
   = ASCII
   | UTF8
@@ -38,7 +40,7 @@ encodingToNode Latin1 = "latin1"
 encodingToNode Binary = "binary"
 encodingToNode Hex = "hex"
 
-foreign import byteLengthImpl :: String -> String -> Int
+foreign import byteLengthImpl :: Fn2 String String Int
 
 byteLength :: String -> Encoding -> Int
-byteLength str enc = byteLengthImpl str (encodingToNode enc)
+byteLength str enc = runFn2 byteLengthImpl str (encodingToNode enc)
