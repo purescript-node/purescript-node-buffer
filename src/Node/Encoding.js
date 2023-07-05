@@ -1,6 +1,3 @@
-/* global Buffer */
-export function byteLengthImpl(str) {
-  return enc => {
-    return Buffer.byteLength(str, enc);
-  };
-}
+import { Buffer } from "node:buffer";
+
+export const byteLengthImpl = (str, enc) => Buffer.byteLength(str, enc);

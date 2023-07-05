@@ -32,12 +32,14 @@ import Prelude
 import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Maybe (Maybe)
 import Effect (Effect)
+import Effect.Uncurried (EffectFn1, EffectFn3, EffectFn4, EffectFn5, runEffectFn1, runEffectFn3, runEffectFn4, runEffectFn5)
 import Node.Buffer.Class (class MutableBuffer)
 import Node.Buffer.Immutable (ImmutableBuffer)
-import Node.Buffer.Internal as Internal
+import Node.Buffer.Immutable as Immutable
 import Node.Buffer.Types (BufferValueType(..), Octet, Offset) as TypesExports
-import Node.Buffer.Types (BufferValueType)
-import Node.Encoding (Encoding)
+import Node.Buffer.Types (BufferValueType, Octet, Offset)
+import Node.Encoding (Encoding, encodingToNode)
+import Unsafe.Coerce (unsafeCoerce)
 
 -- | A reference to a mutable buffer for use with `Effect`
 foreign import data Buffer :: Type
@@ -67,71 +69,94 @@ instance mutableBufferEffect :: MutableBuffer Buffer Effect where
   copy = copy
   fill = fill
 
-create :: Int -> Effect Buffer
-create = Internal.create
-
-freeze :: Buffer -> Effect ImmutableBuffer
-freeze = Internal.copyAll
-
 unsafeFreeze :: Buffer -> Effect ImmutableBuffer
-unsafeFreeze = Internal.unsafeFreeze
-
-thaw :: ImmutableBuffer -> Effect Buffer
-thaw = Internal.copyAll
+unsafeFreeze = pure <<< unsafeCoerce
 
 unsafeThaw :: ImmutableBuffer -> Effect Buffer
-unsafeThaw = Internal.unsafeThaw
+unsafeThaw = pure <<< unsafeCoerce
 
-fromArray :: Array Int -> Effect Buffer
-fromArray = Internal.fromArray
+usingFromImmutable :: forall a. (ImmutableBuffer -> a) -> Buffer -> Effect a
+usingFromImmutable f buf = f <$> unsafeFreeze buf
+
+usingToImmutable :: forall a. (a -> ImmutableBuffer) -> a -> Effect Buffer
+usingToImmutable f x = unsafeThaw $ f x
+
+create :: Int -> Effect Buffer
+create = usingToImmutable Immutable.create
+
+freeze :: Buffer -> Effect ImmutableBuffer
+freeze = runEffectFn1 freezeImpl
+
+foreign import freezeImpl :: EffectFn1 Buffer ImmutableBuffer
+
+thaw :: ImmutableBuffer -> Effect Buffer
+thaw = runEffectFn1 thawImpl
+
+foreign import thawImpl :: EffectFn1 ImmutableBuffer Buffer
+
+fromArray :: Array Octet -> Effect Buffer
+fromArray = usingToImmutable Immutable.fromArray
 
 fromString :: String -> Encoding -> Effect Buffer
-fromString = Internal.fromString
+fromString s = usingToImmutable $ Immutable.fromString s
 
 fromArrayBuffer :: ArrayBuffer -> Effect Buffer
-fromArrayBuffer = Internal.fromArrayBuffer
+fromArrayBuffer = usingToImmutable Immutable.fromArrayBuffer
 
 toArrayBuffer :: Buffer -> Effect ArrayBuffer
-toArrayBuffer = Internal.toArrayBuffer
+toArrayBuffer = usingFromImmutable Immutable.toArrayBuffer
 
-read :: BufferValueType -> Int -> Buffer -> Effect Number
-read = Internal.read
+read :: BufferValueType -> Offset -> Buffer -> Effect Number
+read t o = usingFromImmutable $ Immutable.read t o
 
-readString :: Encoding -> Int -> Int -> Buffer -> Effect String
-readString = Internal.readString
+readString :: Encoding -> Offset -> Offset -> Buffer -> Effect String
+readString enc o o' = usingFromImmutable $ Immutable.readString enc o o'
 
 toString :: Encoding -> Buffer -> Effect String
-toString = Internal.toString
+toString enc = usingFromImmutable $ Immutable.toString enc
 
-write :: BufferValueType -> Number -> Int -> Buffer -> Effect Unit
-write = Internal.write
+write :: BufferValueType -> Number -> Offset -> Buffer -> Effect Unit
+write ty value offset buf = runEffectFn4 writeInternal (show ty) value offset buf
 
-writeString :: Encoding -> Int -> Int -> String -> Buffer -> Effect Int
-writeString = Internal.writeString
+foreign import writeInternal :: EffectFn4 String Number Offset Buffer Unit
 
-toArray :: Buffer -> Effect (Array Int)
-toArray = Internal.toArray
+writeString :: Encoding -> Offset -> Int -> String -> Buffer -> Effect Int
+writeString enc offset len value buf =
+  runEffectFn5 writeStringInternal (encodingToNode enc) offset len value buf
 
-getAtOffset :: Int -> Buffer -> Effect (Maybe Int)
-getAtOffset = Internal.getAtOffset
+foreign import writeStringInternal :: EffectFn5 String Offset Int String Buffer Int
 
-setAtOffset :: Int -> Int -> Buffer -> Effect Unit
-setAtOffset = Internal.setAtOffset
+toArray :: Buffer -> Effect (Array Octet)
+toArray = usingFromImmutable Immutable.toArray
 
-slice :: Int -> Int -> Buffer -> Buffer
-slice = Internal.slice
+getAtOffset :: Offset -> Buffer -> Effect (Maybe Octet)
+getAtOffset o = usingFromImmutable $ Immutable.getAtOffset o
+
+setAtOffset :: Octet -> Offset -> Buffer -> Effect Unit
+setAtOffset val off buff = runEffectFn3 setAtOffsetImpl val off buff
+
+foreign import setAtOffsetImpl :: EffectFn3 Octet Offset Buffer Unit
+
+slice :: Offset -> Offset -> Buffer -> Buffer
+slice = unsafeCoerce Immutable.slice
 
 size :: Buffer -> Effect Int
-size = Internal.size
+size = usingFromImmutable Immutable.size
 
 concat :: Array Buffer -> Effect Buffer
-concat = Internal.concat
+concat arrs = unsafeCoerce \_ -> Immutable.concat (unsafeCoerce arrs)
 
 concat' :: Array Buffer -> Int -> Effect Buffer
-concat' = Internal.concat'
+concat' arrs n = unsafeCoerce \_ -> Immutable.concat' (unsafeCoerce arrs) n
 
-copy :: Int -> Int -> Buffer -> Int -> Buffer -> Effect Int
-copy = Internal.copy
+copy :: Offset -> Offset -> Buffer -> Offset -> Buffer -> Effect Int
+copy srcStart srcEnd src targStart targ = do
+  runEffectFn5 copyImpl srcStart srcEnd src targStart targ
 
-fill :: Int -> Int -> Int -> Buffer -> Effect Unit
-fill = Internal.fill
+foreign import copyImpl :: EffectFn5 Offset Offset Buffer Offset Buffer Int
+
+fill :: Octet -> Offset -> Offset -> Buffer -> Effect Unit
+fill octet start end buf = do
+  runEffectFn4 fillImpl octet start end buf
+
+foreign import fillImpl :: EffectFn4 Octet Offset Offset Buffer Unit
