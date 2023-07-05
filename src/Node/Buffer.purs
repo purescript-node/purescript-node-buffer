@@ -3,6 +3,10 @@ module Node.Buffer
   ( Buffer
   , module TypesExports
   , create
+  , alloc
+  , allocUnsafe
+  , allocUnsafeSlow
+  , compareParts
   , freeze
   , unsafeFreeze
   , thaw
@@ -14,6 +18,7 @@ module Node.Buffer
   , read
   , readString
   , toString
+  , toString'
   , write
   , writeString
   , toArray
@@ -25,6 +30,12 @@ module Node.Buffer
   , concat'
   , copy
   , fill
+  , poolSize
+  , setPoolSize
+  , swap16
+  , swap32
+  , swap64
+  , transcode
   ) where
 
 import Prelude
@@ -81,8 +92,29 @@ usingFromImmutable f buf = f <$> unsafeFreeze buf
 usingToImmutable :: forall a. (a -> ImmutableBuffer) -> a -> Effect Buffer
 usingToImmutable f x = unsafeThaw $ f x
 
+-- | Creates a new buffer of the specified size. Alias to `alloc`.
 create :: Int -> Effect Buffer
-create = usingToImmutable Immutable.create
+create = alloc
+
+-- | Creates a new buffer of the specified size.
+alloc :: Int -> Effect Buffer
+alloc = usingToImmutable Immutable.alloc
+
+-- | Creates a new buffer of the specified size. Unsafe because it reuses memory from a pool
+-- | and may contain sensitive data. See the Node docs: 
+-- | https://nodejs.org/docs/latest-v18.x/api/buffer.html#what-makes-bufferallocunsafe-and-bufferallocunsafeslow-unsafe
+allocUnsafe :: Int -> Effect Buffer
+allocUnsafe s = runEffectFn1 allocUnsafeImpl s
+
+foreign import allocUnsafeImpl :: EffectFn1 (Int) (Buffer)
+
+-- | Creates a new buffer of the specified size. Unsafe because it reuses memory from a pool
+-- | and may contain sensitive data. See the Node docs: 
+-- | https://nodejs.org/docs/latest-v18.x/api/buffer.html#what-makes-bufferallocunsafe-and-bufferallocunsafeslow-unsafe
+allocUnsafeSlow :: Int -> Effect Buffer
+allocUnsafeSlow s = runEffectFn1 allocUnsafeSlowImpl s
+
+foreign import allocUnsafeSlowImpl :: EffectFn1 (Int) (Buffer)
 
 freeze :: Buffer -> Effect ImmutableBuffer
 freeze = runEffectFn1 freezeImpl
@@ -106,6 +138,12 @@ fromArrayBuffer = usingToImmutable Immutable.fromArrayBuffer
 toArrayBuffer :: Buffer -> Effect ArrayBuffer
 toArrayBuffer = usingFromImmutable Immutable.toArrayBuffer
 
+compareParts :: Buffer -> Buffer -> Offset -> Offset -> Offset -> Offset -> Effect Ordering
+compareParts src target targetSrc targetEnd srcStart srcEnd = do
+  src' <- unsafeFreeze src
+  target' <- unsafeFreeze target
+  Immutable.compareParts src' target' targetSrc targetEnd srcStart srcEnd
+
 read :: BufferValueType -> Offset -> Buffer -> Effect Number
 read t o = usingFromImmutable $ Immutable.read t o
 
@@ -114,6 +152,9 @@ readString enc o o' = usingFromImmutable $ Immutable.readString enc o o'
 
 toString :: Encoding -> Buffer -> Effect String
 toString enc = usingFromImmutable $ Immutable.toString enc
+
+toString' :: Encoding -> Offset -> Offset -> Buffer -> Effect String
+toString' enc start end = usingFromImmutable $ Immutable.toString' enc start end
 
 write :: BufferValueType -> Number -> Offset -> Buffer -> Effect Unit
 write ty value offset buf = runEffectFn4 writeInternal (show ty) value offset buf
@@ -160,3 +201,31 @@ fill octet start end buf = do
   runEffectFn4 fillImpl octet start end buf
 
 foreign import fillImpl :: EffectFn4 Octet Offset Offset Buffer Unit
+
+-- | The size (in bytes) of pre-allocated internal Buffer instances used for pooling. This value may be modified.
+foreign import poolSize :: Effect (Int)
+
+setPoolSize :: Int -> Effect Unit
+setPoolSize sizeInBytes = runEffectFn1 setPoolSizeImpl sizeInBytes
+
+foreign import setPoolSizeImpl :: EffectFn1 (Int) (Unit)
+
+swap16 :: Buffer -> Effect Buffer
+swap16 b = runEffectFn1 swap16Impl b
+
+foreign import swap16Impl :: EffectFn1 (Buffer) (Buffer)
+
+swap32 :: Buffer -> Effect Buffer
+swap32 b = runEffectFn1 swap32Impl b
+
+foreign import swap32Impl :: EffectFn1 (Buffer) (Buffer)
+
+swap64 :: Buffer -> Effect Buffer
+swap64 b = runEffectFn1 swap64Impl b
+
+foreign import swap64Impl :: EffectFn1 (Buffer) (Buffer)
+
+transcode :: Buffer -> Encoding -> Encoding -> Effect Buffer
+transcode buf from to = runEffectFn3 transcodeImpl buf (encodingToNode from) (encodingToNode to)
+
+foreign import transcodeImpl :: EffectFn3 (Buffer) (String) (String) (Buffer)

@@ -1,13 +1,16 @@
 -- | Immutable buffers and associated operations.
 module Node.Buffer.Immutable
   ( ImmutableBuffer
+  , compareParts
   , create
+  , alloc
   , fromArray
   , fromString
   , fromArrayBuffer
   , read
   , readString
   , toString
+  , toString'
   , toArray
   , toArrayBuffer
   , getAtOffset
@@ -23,8 +26,11 @@ import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Function.Uncurried (Fn2, Fn3, Fn4, runFn2, runFn3, runFn4)
 import Data.Maybe (Maybe)
 import Data.Nullable (Nullable, toMaybe)
+import Effect (Effect)
+import Effect.Uncurried (EffectFn6, runEffectFn6)
 import Node.Buffer.Types (BufferValueType, Octet, Offset)
 import Node.Encoding (Encoding, encodingToNode)
+import Partial.Unsafe (unsafeCrashWith)
 
 -- | An immutable buffer that exists independently of any memory region or effect.
 foreign import data ImmutableBuffer :: Type
@@ -48,22 +54,34 @@ instance ordBuffer :: Ord ImmutableBuffer where
 
 foreign import compareImpl :: Fn2 ImmutableBuffer ImmutableBuffer Int
 
+-- | Creates a new buffer of the specified size. Alias for `alloc`.
+create :: Int -> ImmutableBuffer
+create = alloc
+
 -- | Creates a new buffer of the specified size.
-foreign import create :: Int -> ImmutableBuffer
+foreign import alloc :: Int -> ImmutableBuffer
 
 -- | Creates a new buffer from an array of octets, sized to match the array.
 foreign import fromArray :: Array Octet -> ImmutableBuffer
 
 -- | Creates a buffer view from a JS ArrayByffer without copying data.
---
--- Requires Node >= v5.10.0
 foreign import fromArrayBuffer :: ArrayBuffer -> ImmutableBuffer
 
 -- | Creates a new buffer from a string with the specified encoding, sized to match the string.
 fromString :: String -> Encoding -> ImmutableBuffer
-fromString str = runFn2 fromStringImpl str <<< encodingToNode
+fromString str enc = runFn2 fromStringImpl str $ encodingToNode enc
 
 foreign import fromStringImpl :: Fn2 String String ImmutableBuffer
+
+compareParts :: ImmutableBuffer -> ImmutableBuffer -> Offset -> Offset -> Offset -> Offset -> Effect Ordering
+compareParts src target targetStart targetEnd sourceStart sourceEnd =
+  runEffectFn6 comparePartsImpl src target targetStart targetEnd sourceStart sourceEnd <#> case _ of
+    -1 -> LT
+    0 -> EQ
+    1 -> GT
+    x -> unsafeCrashWith $ "Impossible: Invalid value: " <> show x
+
+foreign import comparePartsImpl :: EffectFn6 ImmutableBuffer ImmutableBuffer Int Int Int Int Int
 
 -- | Reads a numeric value from a buffer at the specified offset.
 read :: BufferValueType -> Offset -> ImmutableBuffer -> Number
@@ -82,6 +100,11 @@ toString :: Encoding -> ImmutableBuffer -> String
 toString enc buf = runFn2 toStringImpl (encodingToNode enc) buf
 
 foreign import toStringImpl :: Fn2 String ImmutableBuffer String
+
+toString' :: Encoding -> Offset -> Offset -> ImmutableBuffer -> String
+toString' enc start end buf = runFn4 toStringSubImpl enc start end buf
+
+foreign import toStringSubImpl :: Fn4 Encoding Offset Offset ImmutableBuffer String
 
 -- | Creates an array of octets from a buffer's contents.
 foreign import toArray :: ImmutableBuffer -> Array Octet

@@ -1,4 +1,7 @@
-import { Buffer } from "node:buffer";
+import { Buffer, transcode } from "node:buffer";
+
+export const allocUnsafeImpl = (size) => Buffer.allocUnsafe(size);
+export const allocUnsafeSlowImpl = (size) => Buffer.allocUnsafeSlow(size);
 
 export const freezeImpl = (a) => Buffer.from(a);
 export const thawImpl = (a) => Buffer.from(a);
@@ -17,3 +20,14 @@ export const copyImpl = (srcStart, srcEnd, src, targStart, targ) =>
 
 export const fillImpl = (octet, start, end, buf) =>
   buf.fill(octet, start, end);
+
+export const poolSize = () => Buffer.poolSize;
+
+export const setPoolSizeImpl = (size) => { 
+  Buffer.poolSize = size; 
+};
+
+export const swap16Impl = (buf) => buf.swap16();
+export const swap32Impl = (buf) => buf.swap32();
+export const swap64Impl = (buf) => buf.swap64();
+export const transcodeImpl = (buf, from, to) => transcode(buf, from, to);
