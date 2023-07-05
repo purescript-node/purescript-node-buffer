@@ -14,6 +14,7 @@ data Encoding
   | UTF16LE
   | UCS2
   | Base64
+  | Base64Url
   | Latin1
   | Binary
   | Hex
@@ -24,6 +25,7 @@ instance showEncoding :: Show Encoding where
   show UTF16LE = "UTF16LE"
   show UCS2 = "UCS2"
   show Base64 = "Base64"
+  show Base64Url = "Base64Url"
   show Latin1 = "Latin1"
   show Binary = "Binary"
   show Hex = "Hex"
@@ -36,6 +38,7 @@ encodingToNode UTF8 = "utf8"
 encodingToNode UTF16LE = "utf16le"
 encodingToNode UCS2 = "ucs2"
 encodingToNode Base64 = "base64"
+encodingToNode Base64Url = "base64url"
 encodingToNode Latin1 = "latin1"
 encodingToNode Binary = "binary"
 encodingToNode Hex = "hex"
