@@ -5,6 +5,17 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+
+New features:
+
+Bugfixes:
+
+Other improvements:
+
+
+## [v9.0.0](https://github.com/purescript-node/purescript-node-buffer/releases/tag/v9.0.0) - 2022-06-05
+
+Breaking changes:
 - Expose Buffer API using typeclass-less API witout removing typeclass API (#53 by @JordanMartinez)
 
   Previously, compiler would fail to infer the type of `Buffer.create 1` as `Effect Buffer` 
