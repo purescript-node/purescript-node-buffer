@@ -7,7 +7,7 @@ export const eqImpl = (a, b) => a.equals(b);
 
 export const compareImpl = (a, b) => a.compare(b);
 
-export const comparePartsImpl = (src, target, targetStart, targetEnd, sourceStart, sourceEnd) => 
+export const comparePartsImpl = (src, target, targetStart, targetEnd, sourceStart, sourceEnd) =>
   src.compare(target, targetStart, targetEnd, sourceStart, sourceEnd);
 
 export const alloc = (size) => Buffer.alloc(size);

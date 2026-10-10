@@ -18,13 +18,12 @@ export const setAtOffsetImpl = (value, offset, buff) => {
 export const copyImpl = (srcStart, srcEnd, src, targStart, targ) =>
   src.copy(targ, targStart, srcStart, srcEnd);
 
-export const fillImpl = (octet, start, end, buf) =>
-  buf.fill(octet, start, end);
+export const fillImpl = (octet, start, end, buf) => buf.fill(octet, start, end);
 
 export const poolSize = () => Buffer.poolSize;
 
-export const setPoolSizeImpl = (size) => { 
-  Buffer.poolSize = size; 
+export const setPoolSizeImpl = (size) => {
+  Buffer.poolSize = size;
 };
 
 export const swap16Impl = (buf) => buf.swap16();
